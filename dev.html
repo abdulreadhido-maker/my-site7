@@ -18,6 +18,7 @@
     --green:#00ff88;
     --text:#e2e8f0;
     --sec:#94a3b8;
+    --blur-amount: 0px; /* للتحكم في تأثير الانتقال الضبابي */
 }
 
 *{
@@ -32,11 +33,38 @@ body{
     color:white;
     padding:40px 5%;
     min-height:100vh;
+    filter: blur(var(--blur-amount));
+    transition: filter 0.4s ease, background 0.5s ease;
 }
 
 .container{
     max-width:1100px;
     margin:auto;
+}
+
+/* شريط التحكم العلوي */
+.top-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.btn-lang {
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: 0.3s;
+}
+.btn-lang:hover {
+    border-color: var(--cyan);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+    transform: translateY(-2px);
 }
 
 .header{
@@ -104,7 +132,7 @@ h2{
     flex-wrap:wrap;
 }
 
-button{
+button.action-btn{
     border:none;
     padding:13px 25px;
     border-radius:10px;
@@ -114,7 +142,7 @@ button{
     transition:.2s;
 }
 
-button:hover{
+button.action-btn:hover{
     transform:translateY(-2px);
 }
 
@@ -203,18 +231,20 @@ button:hover{
 
 <div class="container">
 
+    <div class="top-actions">
+        <div></div>
+        <button class="btn-lang" id="lang-btn" onclick="toggleLang()">🌐 EN</button>
+    </div>
+
     <div class="header">
-        <h1>🛡️ TORREMA SECURITY SCANNER</h1>
-        <p>
-            نظام تحليل وفحص الأكواد البرمجية للكشف عن
-            الثغرات الأمنية والمالممارسات البرمجية الخطيرة.
-        </p>
-        <p style="font-size: 13px; color: var(--pink); margin-top: 5px;">ملاحظة: قد تكون نتائج الفحوصات ليست مضمونة 100%</p>
+        <h1 id="header-title">🛡️ TORREMA SECURITY SCANNER</h1>
+        <p id="header-desc">نظام تحليل وفحص الأكواد البرمجية للكشف عن الثغرات الأمنية والممارسات البرمجية الخطيرة.</p>
+        <p id="header-note" style="font-size: 13px; color: var(--pink); margin-top: 5px;">ملاحظة: قد تكون نتائج الفحوصات ليست مضمونة 100%</p>
     </div>
 
     <div class="box">
 
-        <h2>🔍 الصق الكود البرمجي هنا</h2>
+        <h2 id="input-title">🔍 الصق الكود البرمجي هنا</h2>
 
 <textarea class="code-input" id="codeInput" placeholder="// ضع الكود هنا...">
 const password = "123456";
@@ -226,15 +256,15 @@ document.body.innerHTML = userInput;
 
         <div class="buttons">
 
-            <button class="scan-btn" onclick="runFullScan()">
+            <button class="action-btn scan-btn" id="btn-scan" onclick="runFullScan()">
             ⚡ بدء الفحص الأمني
             </button>
 
-            <button class="speed-btn" onclick="runSpeedTest()">
+            <button class="action-btn speed-btn" id="btn-speed" onclick="runSpeedTest()">
             🚀 اختبار السرعة
             </button>
 
-            <button class="clear-btn" onclick="clearTerminal()">
+            <button class="action-btn clear-btn" id="btn-clear" onclick="clearTerminal()">
             🧹 تنظيف
             </button>
 
@@ -243,17 +273,17 @@ document.body.innerHTML = userInput;
         <div class="stats">
 
             <div class="stat-card">
-                <h3>عدد الأسطر</h3>
+                <h3 id="stat-lines">عدد الأسطر</h3>
                 <p id="linesCount">0</p>
             </div>
 
             <div class="stat-card">
-                <h3>الثغرات المكتشفة</h3>
+                <h3 id="stat-vulns">الثغرات المكتشفة</h3>
                 <p id="vulnsCount">0</p>
             </div>
 
             <div class="stat-card">
-                <h3>وقت التحليل</h3>
+                <h3 id="stat-time">وقت التحليل</h3>
                 <p id="scanTime">0 ms</p>
             </div>
 
@@ -264,7 +294,7 @@ document.body.innerHTML = userInput;
     </div>
 
     <div class="footer">
-        <a href="index.html" class="back-btn">← العودة للرئيسية</a>
+        <a href="index.html" class="back-btn" id="back-btn">← العودة للرئيسية</a>
     </div>
 
 </div>
@@ -277,52 +307,201 @@ const linesCount = document.getElementById("linesCount");
 const vulnsCount = document.getElementById("vulnsCount");
 const scanTime = document.getElementById("scanTime");
 
+// قواعد فحص الثغرات مع رسائل الترجمة الثنائية
 const rules = [
     {
         name:"eval",
         severity:"CRITICAL",
         regex:/eval\s*\(/,
-        message:"استخدام eval() يسمح بتنفيذ أكواد خبيثة ديناميكية.",
-        fix:"تجنب تنفيذ الأكواد عبر النصوص واستخدم الوظائف الأصلية."
+        msg: {
+            ar: "استخدام eval() يسمح بتنفيذ أكواد خبيثة ديناميكية.",
+            en: "Using eval() allows executing dangerous dynamic scripts."
+        },
+        fix: {
+            ar: "تجنب تنفيذ الأكواد عبر النصوص واستخدم الوظائف الأصلية.",
+            en: "Avoid executing code via strings; utilize native functions instead."
+        }
     },
     {
         name:"innerHTML",
         severity:"HIGH",
         regex:/innerHTML\s*=/,
-        message:"استخدام innerHTML قد يسبب ثغرات حقن البرمجيات XSS.",
-        fix:"استخدم textContent أو createElement بدلاً منها."
+        msg: {
+            ar: "استخدام innerHTML قد يسبب ثغرات حقن البرمجيات XSS.",
+            en: "Using innerHTML can expose your application to XSS injection flaws."
+        },
+        fix: {
+            ar: "استخدم textContent أو createElement بدلاً منها.",
+            en: "Use textContent or createElement safely instead."
+        }
     },
     {
         name:"hardcoded-password",
         severity:"HIGH",
         regex:/(password|secret|token)\s*=\s*['"`].+['"`]/i,
-        message:"تم العثور على بيانات حساسة أو رموز مرور مكتوبة بشكل ثابت داخل الكود.",
-        fix:"استخدم ملفات التكوين والبيئة المؤمنة .env."
+        msg: {
+            ar: "تم العثور على بيانات حساسة أو رموز مرور مكتوبة بشكل ثابت داخل الكود.",
+            en: "Hardcoded sensitive credentials or raw password tokens detected."
+        },
+        fix: {
+            ar: "استخدم ملفات التكوين والبيئة المؤمنة .env.",
+            en: "Store these variables securely inside .env file environments."
+        }
     },
     {
         name:"document-write",
         severity:"MEDIUM",
         regex:/document\.write\s*\(/,
-        message:"استخدام document.write يعتبر ممارسة غير آمنة وقديمة.",
-        fix:"استخدم DOM APIs الحديثة لبناء العناصر."
+        msg: {
+            ar: "استخدام document.write يعتبر ممارسة غير آمنة وقديمة.",
+            en: "Utilizing document.write is an insecure and obsolete standard."
+        },
+        fix: {
+            ar: "استخدم DOM APIs الحديثة لبناء العناصر.",
+            en: "Migrate to standard modern DOM APIs to render document trees."
+        }
     },
     {
         name:"setTimeout-string",
         severity:"MEDIUM",
         regex:/setTimeout\s*\(\s*['"`]/,
-        message:"تمرير نصوص برمجية داخل setTimeout يهدد سلامة التطبيق.",
-        fix:"مرر Function مباشرة بدلاً من String."
+        msg: {
+            ar: "تمرير نصوص برمجية داخل setTimeout يهدد سلامة التطبيق.",
+            en: "Passing raw script strings into setTimeout triggers vulnerability threats."
+        },
+        fix: {
+            ar: "مرر Function مباشرة بدلاً من String.",
+            en: "Pass a reference closure Function directly instead of raw Strings."
+        }
     },
     {
         name:"sql-injection",
         severity:"CRITICAL",
         regex:/SELECT.+FROM.+\+/i,
-        message:"احتمال وجود ثغرة حقن قواعد بيانات SQL Injection نتيجة دمج النصوص.",
-        fix:"استخدم الاستعلامات المجهزة مسبقاً (Prepared Statements)."
+        msg: {
+            ar: "احتمال وجود ثغرة حقن قواعد بيانات SQL Injection نتيجة دمج النصوص.",
+            en: "Potential SQL Injection vector identified via unsafe string concatenation."
+        },
+        fix: {
+            ar: "استخدم الاستعلامات المجهزة مسبقاً (Prepared Statements).",
+            en: "Refactor database operations to leverage Prepared Statements parameters."
+        }
     }
 ];
 
-// دالة الطباعة المعدلة لتدعم الألوان لكل سطر بشكل مستقل وبدون مشاكل الاختفاء
+// قاموس الترجمة الكامل لجميع عناصر وواجهات الصفحة ومخرجات الـ Terminal
+const dictionary = {
+    ar: {
+        dir: "rtl",
+        langBtn: "🌐 EN",
+        backBtn: "← العودة للرئيسية",
+        headerTitle: "🛡️ TORREMA SECURITY SCANNER",
+        headerDesc: "نظام تحليل وفحص الأكواد البرمجية للكشف عن الثغرات الأمنية والمالممارسات البرمجية الخطيرة.",
+        headerNote: "ملاحظة: قد تكون نتائج الفحوصات ليست مضمونة 100%",
+        inputTitle: "🔍 الصق الكود البرمجي هنا",
+        placeholder: "// ضع الكود هنا...",
+        btnScan: "⚡ بدء الفحص الأمني",
+        btnSpeed: "🚀 اختبار السرعة",
+        btnClear: "🧹 تنظيف",
+        statLines: "عدد الأسطر",
+        statVulns: "الثغرات المكتشفة",
+        statTime: "وقت التحليل",
+        readyTerminal: "> System ready... Waiting for scan.",
+        errorNoCode: "> [ERROR] الرجاء إدخال كود أولاً للتحليل.",
+        initLog: "> [INIT] بدء تشغيل محرك التحليل الساكن لـ Torrema...",
+        scanLog: "> [SCAN] تحليل الكود سطر بسطر وفحص الأنماط...",
+        successLog1: "> [SUCCESS] رائع! لم يتم اكتشاف ثغرات معروفة في الملف.",
+        successLog2: "> الكود الخاص بك يتبع أفضل ممارسات الحماية الحديثة.",
+        warningLog: (count) => `> [WARNING] تم اكتشاف ${count} مشكلة أمنية محتملة:`,
+        riskLog: (i, sev) => `[#${i}] المخاطرة: ${sev}`,
+        lineLog: (line) => `   السطر الحالي: ${line}`,
+        codeLog: (code) => `   الكود المصاب: ${code}`,
+        vulnLog: (msg) => `   المشكلة الأمنية: ${msg}`,
+        fixLog: (fix) => `   الإصلاح المقترح: ${fix}`,
+        clearedLog: "> [CLEARED] تم تنظيف السجل بنجاح.",
+        speedStart: "> [SPEED TEST] بدء اختبار أداء المحرك السحابي...",
+        speedSuccess: "> تم بنجاح معالجة وتنفيذ (1,000,000) عملية منطقية وحسابية مجردة.",
+        speedResult: (res) => `> زمن الاستجابة الفعلي للمعالجة: ${res} ms`
+    },
+    en: {
+        dir: "ltr",
+        langBtn: "🌐 AR",
+        backBtn: "Back to Home →",
+        headerTitle: "🛡️ TORREMA SECURITY SCANNER",
+        headerDesc: "Static analysis tool engineered to audit application layers, identify exploits, and verify security protocols.",
+        headerNote: "Note: Automated audit profiles are not guaranteed 100%.",
+        inputTitle: "🔍 Paste Source Code Below",
+        placeholder: "// Paste your source scripts here...",
+        btnScan: "⚡ Run Security Scan",
+        btnSpeed: "🚀 Speed Test Engine",
+        btnClear: "🧹 Clear Log",
+        statLines: "Lines of Code",
+        statVulns: "Exploits Found",
+        statTime: "Analysis Time",
+        readyTerminal: "> System ready... Waiting for scan.",
+        errorNoCode: "> [ERROR] Please input valid source scripts to run analysis.",
+        initLog: "> [INIT] Initializing Torrema core static code analysis pipeline...",
+        scanLog: "> [SCAN] Parsing codebase lines and evaluating heuristic signatures...",
+        successLog1: "> [SUCCESS] Outstanding! Zero verified vulnerabilities found in this resource.",
+        successLog2: "> Your script follows secure architectural best practices.",
+        warningLog: (count) => `> [WARNING] Flagged ${count} potential security risks inside compilation:`,
+        riskLog: (i, sev) => `[#${i}] Severity Risk: ${sev}`,
+        lineLog: (line) => `   Source Line: ${line}`,
+        codeLog: (code) => `   Affected Scope: ${code}`,
+        vulnLog: (msg) => `   Threat Vector: ${msg}`,
+        fixLog: (fix) => `   Remediation Fix: ${fix}`,
+        clearedLog: "> [CLEARED] Console runtime logs reset successfully.",
+        speedStart: "> [SPEED TEST] Spawning telemetry tracking for cloud compute core...",
+        speedSuccess: "> Completed raw processing sequences for (1,000,000) boolean execution loops.",
+        speedResult: (res) => `> Realtime cloud cluster response latency: ${res} ms`
+    }
+};
+
+let currentLang = localStorage.getItem("calc_lang") || "ar";
+
+function applyLanguage(lang) {
+    const data = dictionary[lang];
+    document.documentElement.setAttribute("dir", data.dir);
+    document.documentElement.setAttribute("lang", lang);
+
+    // تحديث نصوص الواجهة الواجهة
+    document.getElementById("lang-btn").innerText = data.langBtn;
+    document.getElementById("back-btn").innerText = data.backBtn;
+    document.getElementById("header-title").innerText = data.headerTitle;
+    document.getElementById("header-desc").innerText = data.headerDesc;
+    document.getElementById("header-note").innerText = data.headerNote;
+    document.getElementById("input-title").innerText = data.inputTitle;
+    document.getElementById("codeInput").placeholder = data.placeholder;
+    document.getElementById("btn-scan").innerText = data.btnScan;
+    document.getElementById("btn-speed").innerText = data.btnSpeed;
+    document.getElementById("btn-clear").innerText = data.btnClear;
+    document.getElementById("stat-lines").innerText = data.statLines;
+    document.getElementById("stat-vulns").innerText = data.statVulns;
+    document.getElementById("stat-time").innerText = data.statTime;
+
+    // تصفير وتهيئة الـ terminal بناءً على اللغة المحددة
+    terminal.innerHTML = "";
+    log(data.readyTerminal, "#00ff88");
+}
+
+function toggleLang() {
+    document.body.style.setProperty('--blur-amount', '12px');
+    setTimeout(() => {
+        currentLang = currentLang === "ar" ? "en" : "ar";
+        localStorage.setItem("calc_lang", currentLang);
+        applyLanguage(currentLang);
+        
+        // إعادة تهيئة عدادات الإحصاء عند تحويل لغة الصفحة
+        linesCount.innerText = "0";
+        vulnsCount.innerText = "0";
+        scanTime.innerText = "0 ms";
+
+        setTimeout(() => {
+            document.body.style.setProperty('--blur-amount', '0px');
+        }, 150);
+    }, 200);
+}
+
 function log(text, color="#00ff88"){
     const span = document.createElement("span");
     span.style.color = color;
@@ -334,7 +513,7 @@ function log(text, color="#00ff88"){
 
 function clearTerminal(){
     terminal.innerHTML = "";
-    log("> [CLEARED] تم تنظيف السجل بنجاح.");
+    log(dictionary[currentLang].clearedLog);
     linesCount.innerText = "0";
     vulnsCount.innerText = "0";
     scanTime.innerText = "0 ms";
@@ -342,17 +521,18 @@ function clearTerminal(){
 
 async function runFullScan(){
     const code = codeInput.value;
+    const data = dictionary[currentLang];
 
     if(!code.trim()){
         terminal.innerHTML = "";
-        log("> [ERROR] الرجاء إدخال كود أولاً للتحليل.", var(--pink));
+        log(data.errorNoCode, "#ff00cc");
         return;
     }
 
     terminal.innerHTML = "";
 
-    log("> [INIT] بدء تشغيل محرك التحليل الساكن لـ Torrema...");
-    log("> [SCAN] تحليل الكود سطر بسطر وفحص الأنماط...");
+    log(data.initLog);
+    log(data.scanLog);
     
     const start = performance.now();
     await sleep(700);
@@ -369,8 +549,8 @@ async function runFullScan(){
                     line: index + 1,
                     severity: rule.severity,
                     code: line.trim(),
-                    message: rule.message,
-                    fix: rule.fix
+                    message: rule.msg[currentLang],
+                    fix: rule.fix[currentLang]
                 });
             }
         });
@@ -384,30 +564,31 @@ async function runFullScan(){
 
     if(found.length === 0){
         log("");
-        log("> [SUCCESS] رائع! لم يتم اكتشاف ثغرات معروفة في الملف.", "#00ff88");
-        log("> الكود الخاص بك يتبع أفضل ممارسات الحماية الحديثة.", "#00ff88");
+        log(data.successLog1, "#00ff88");
+        log(data.successLog2, "#00ff88");
     } else {
         log("");
-        log(`> [WARNING] تم اكتشاف ${found.length} مشكلة أمنية محتملة:`, "#ffcc00");
-        log("------------------------------------------------", "var(--sec)");
+        log(data.warningLog(found.length), "#ffcc00");
+        log("------------------------------------------------", "#94a3b8");
 
         found.forEach((v, i) => {
             let severityColor = "#ff00cc"; // Critical / High
             if(v.severity === "MEDIUM") severityColor = "#3333ff";
 
-            log(`[#${i+1}] المخاطرة: ${v.severity}`, severityColor);
-            log(`   السطر الحالي: ${v.line}`, "white");
-            log(`   الكود المصاب: ${v.code}`, "#94a3b8");
-            log(`   المشكلة الأمنية: ${v.message}`, "#ffcc00");
-            log(`   الإصلاح المقترح: ${v.fix}`, "#00ffff");
-            log("------------------------------------------------", "var(--sec)");
+            log(data.riskLog(i+1, v.severity), severityColor);
+            log(data.lineLog(v.line), "white");
+            log(data.codeLog(v.code), "#94a3b8");
+            log(data.vulnLog(v.message), "#ffcc00");
+            log(data.fixLog(v.fix), "#00ffff");
+            log("------------------------------------------------", "#94a3b8");
         });
     }
 }
 
 async function runSpeedTest(){
+    const data = dictionary[currentLang];
     terminal.innerHTML = "";
-    log("> [SPEED TEST] بدء اختبار أداء المحرك السحابي...", "#00ffff");
+    log(data.speedStart, "#00ffff");
 
     const start = performance.now();
     let total = 0;
@@ -419,13 +600,18 @@ async function runSpeedTest(){
 
     await sleep(500);
 
-    log("> تم بنجاح معالجة وتنفيذ (1,000,000) عملية منطقية وحسابية مجردة.", "white");
-    log(`> زمن الاستجابة الفعلي للمعالجة: ${result} ms`, "#00ffff");
+    log(data.speedSuccess, "white");
+    log(data.speedResult(result), "#00ffff");
 }
 
 function sleep(ms){
     return new Promise(resolve => setTimeout(resolve, ms));
 }
+
+// تشغيل النظام فور تحميل الصفحة
+window.onload = function() {
+    applyLanguage(currentLang);
+};
 
 </script>
 
