@@ -11,10 +11,32 @@
   --card-bg: rgba(25, 25, 28, 0.7);
   --border-color: rgba(51, 51, 255, 0.2);
   --text-sec: #94a3b8;
+  --blur-amount: 0px; /* التحكم في تأثير الضبابية */
 }
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-body { background: var(--bg-dark); color: white; padding: 40px 5%; min-height: 100vh; }
+
+body { 
+  background: var(--bg-dark); 
+  color: white; 
+  padding: 40px 5%; 
+  min-height: 100vh; 
+  position: relative;
+  /* تطبيق تأثير الـ Blur على الصفحة بالكامل */
+  filter: blur(var(--blur-amount));
+  transition: filter 0.4s ease, background 0.5s ease, color 0.5s ease;
+}
+
 .container { max-width: 800px; margin: 0 auto; }
+
+/* زر تبديل اللغة العلوي */
+.lang-switcher-container { display: flex; justify-content: flex-end; margin-bottom: 20px; }
+.btn-lang {
+  background: var(--card-bg); border: 1px solid var(--border-color); color: white;
+  padding: 8px 16px; border-radius: 30px; cursor: pointer; font-size: 14px; font-weight: 600;
+  transition: 0.3s;
+}
+.btn-lang:hover { border-color: #ff00cc; box-shadow: 0 0 10px rgba(255,0,204,0.3); transform: scale(1.05); }
+
 .header { text-align: center; margin-bottom: 40px; }
 .header h1 { font-size: 35px; margin-bottom: 10px; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-size: 200%; }
 .box { background: var(--card-bg); border: 1px solid var(--border-color); padding: 30px; border-radius: 16px; margin-bottom: 25px; }
@@ -37,39 +59,139 @@ p { color: var(--text-sec); line-height: 1.6; font-size: 15px; }
 <body>
 
 <div class="container">
+  <!-- منطقة تبديل اللغة -->
+  <div class="lang-switcher-container">
+    <button class="btn-lang" id="lang-btn" onclick="toggleLang()">🌐 EN</button>
+  </div>
+
   <div class="header">
-    <h1>✨ هندسة واجهات المبيعات وتجربة المستخدم</h1>
-    <p>أداة بصرية حية لمساعدتك في فهم كيف يؤثر التصميم والترتيب الهندسي على زيادة مبيعاتك أو خسارتها.</p>
+    <h1 id="main-title">✨ هندسة واجهات المبيعات وتجربة المستخدم</h1>
+    <p id="main-desc">أداة بصرية حية لمساعدتك في فهم كيف يؤثر التصميم والترتيب الهندسي على زيادة مبيعاتك أو خسارتها.</p>
   </div>
 
   <div class="box">
-    <h2>👀 شاهد التغيير: تصميم عادي وعشوائي VS تصميم مدروس ومقنع</h2>
-    <p>قارن بنفسك بين التخطيطين لتدرك لماذا يهرب الزبائن من بعض المواقع وينجذبون لمواقع أخرى مريحة بصرياً:</p>
+    <h2 id="compare-title">👀 شاهد التغيير: تصميم عادي وعشوائي VS تصميم مدروس ومقنع</h2>
+    <p id="compare-desc">قارن بنفسك بين التخطيطين لتدرك لماذا يهرب الزبائن من بعض المواقع وينجذبون لمواقع أخرى مريحة بصرياً:</p>
     
     <div class="comparison-container">
       <div class="compare-card bad-ui">
-        <h3 style="color:#ef4444; margin-bottom: 8px;">❌ التصميم العشوائي (السيئ)</h3>
-        <p style="font-size: 13px;">نصوص طويلة جداً متداخلة، ألوان عشوائية ومؤذية للعين، وزر الشراء غير واضح وصغير جداً في زاوية ميتة.</p>
-        <span class="mock-btn bad-btn">اضغط هنا للاشتراك بالخدمة من موقعنا الآن</span>
-        <small class="explain-text" style="color: #ef4444;">النتيجة: العميل يضيع ويغلق الصفحة فوراً.</small>
+        <h3 style="color:#ef4444; margin-bottom: 8px;" id="bad-title">❌ التصميم العشوائي (السيئ)</h3>
+        <p style="font-size: 13px;" id="bad-desc">نصوص طويلة جداً متداخلة، ألوان عشوائية ومؤذية للعين، وزر الشراء غير واضح وصغير جداً في زاوية ميتة.</p>
+        <span class="mock-btn bad-btn" id="bad-btn-text">اضغط هنا للاشتراك بالخدمة من موقعنا الآن</span>
+        <small class="explain-text" style="color: #ef4444;" id="bad-result">النتيجة: العميل يضيع ويغلق الصفحة فوراً.</small>
       </div>
       
       <div class="compare-card good-ui">
-        <h3 style="color:#22c55e; margin-bottom: 8px;">✅ تصميم Torrema (الممتاز)</h3>
-        <p style="font-size: 13px;">ألوان مريحة نفسياً ومدروسة، نقاط واضحة ومباشرة تلخص الفائدة، وزر شراء واضح يجذب عين الزائر ليتخذ قراراً سريعاً.</p>
-        <span class="mock-btn good-btn">احصل على العرض الآن 🚀</span>
-        <small class="explain-text" style="color: #22c55e;">النتيجة: زيادة في نسبة المبيعات وتفاعل فوري!</small>
+        <h3 style="color:#22c55e; margin-bottom: 8px;" id="good-title">✅ تصميم Torrema (الممتاز)</h3>
+        <p style="font-size: 13px;" id="good-desc">ألوان مريحة نفسياً ومدروسة، نقاط واضحة ومباشرة تلخص الفائدة، وزر شراء واضح يجذب عين الزائر ليتخذ قراراً سريعاً.</p>
+        <span class="mock-btn good-btn" id="good-btn-text">احصل على العرض الآن 🚀</span>
+        <small class="explain-text" style="color: #22c55e;" id="good-result">النتيجة: زيادة في نسبة المبيعات وتفاعل فوري!</small>
       </div>
     </div>
   </div>
 
   <div class="box">
-    <h2>ℹ️ كيف نساعدك في دراسة سلوك العميل؟</h2>
-    <p>نقوم برسم وبناء رحلة العميل خطوة بخطوة من لحظة دخوله للموقع وحتى إتمام الدفع، بحيث نوجه نظره بذكاء وبطرق نفسية مدروسة نحو المنتجات أو الخدمات التي ترغب ببيعها بكثافة.</p>
+    <h2 id="info-title">ℹ️ كيف نساعدك في دراسة سلوك العميل؟</h2>
+    <p id="info-desc">نقوم برسم وبناء رحلة العميل خطوة بخطوة من لحظة دخوله للموقع وحتى إتمام الدفع، بحيث نوجه نظره بذكاء وبطرق نفسية مدروسة نحو المنتجات أو الخدمات التي ترغب ببيعها بكثافة.</p>
   </div>
 
-  <center><a href="index.html" class="back-btn">← العودة للرئيسية</a></center>
+  <center><a href="index.html" class="back-btn" id="back-btn">← العودة للرئيسية</a></center>
 </div>
 
+<script>
+// قاموس الكلمات والترجمات للغتين
+const dictionary = {
+  ar: {
+    dir: "rtl",
+    langBtn: "🌐 EN",
+    mainTitle: "✨ هندسة واجهات المبيعات وتجربة المستخدم",
+    mainDesc: "أداة بصرية حية لمساعدتك في فهم كيف يؤثر التصميم والترتيب الهندسي على زيادة مبيعاتك أو خسارتها.",
+    compareTitle: "👀 شاهد التغيير: تصميم عادي وعشوائي VS تصميم مدروس ومقنع",
+    compareDesc: "قارن بنفسك بين التخطيطين لتدرك لماذا يهرب الزبائن من بعض المواقع وينجذبون لمواقع أخرى مريحة بصرياً:",
+    badTitle: "❌ التصميم العشوائي (السيئ)",
+    badDesc: "نصوص طويلة جداً متداخلة، ألوان عشوائية ومؤذية للعين، وزر الشراء غير واضح وصغير جداً في زاوية ميتة.",
+    badBtnText: "اضغط هنا للاشتراك بالخدمة من موقعنا الآن",
+    badResult: "النتيجة: العميل يضيع ويغلق الصفحة فوراً.",
+    goodTitle: "✅ تصميم Torrema (الممتاز)",
+    goodDesc: "ألوان مريحة نفسياً ومدروسة، نقاط واضحة ومباشرة تلخص الفائدة، وزر شراء واضح يجذب عين الزائر ليتخذ قراراً سريعاً.",
+    goodBtnText: "احصل على العرض الآن 🚀",
+    goodResult: "النتيجة: زيادة في نسبة المبيعات وتفاعل فوري!",
+    infoTitle: "ℹ️ كيف نساعدك في دراسة سلوك العميل؟",
+    infoDesc: "نقوم برسم وبناء رحلة العميل خطوة بخطوة من لحظة دخوله للموقع وحتى إتمام الدفع، بحيث نوجه نظره بذكاء وبطرق نفسية مدروسة نحو المنتجات أو الخدمات التي ترغب ببيعها بكثافة.",
+    backBtn: "← العودة للرئيسية"
+  },
+  en: {
+    dir: "ltr",
+    langBtn: "🌐 AR",
+    mainTitle: "✨ Sales UI/UX & Conversion Engineering",
+    mainDesc: "A live visual tool to help you understand how intentional design and spatial layouts impact your sales conversion or loss.",
+    compareTitle: "👀 Witness the Change: Generic Layout VS Strategic Design",
+    compareDesc: "Compare both frameworks to understand why users bounce from unoptimized websites while converting heavily on structured platforms:",
+    badTitle: "❌ Unstructured Layout (Poor UX)",
+    badDesc: "Overwhelming blocks of text, exhausting color harmony, and a microscopic call-to-action buried in a dead-zone layout.",
+    badBtnText: "Click here to subscribe to our services via this web link now",
+    badResult: "Outcome: Total customer friction. User leaves instantly.",
+    goodTitle: "✅ Torrema Standard (Premium UX)",
+    goodDesc: "High-end aesthetic contrasts, scannable value hooks, and an optimized, high-converting CTA that guides user decision-making.",
+    goodBtnText: "Claim Your Offer Now 🚀",
+    goodResult: "Outcome: Immediate user engagement and spiking sales!",
+    infoTitle: "ℹ️ How do we engineer your customer's journey?",
+    infoDesc: "We map out and program your visitor's behavioral loop from initial hit to checkout, scientifically guiding their eye level towards your primary, high-ticket services effortlessly.",
+    backBtn: "Back to Home →"
+  }
+};
+
+// قراءة المفتاح المسجل في المتصفح مسبقاً لتوحيد اللغة في الموقع
+let currentLang = localStorage.getItem("calc_lang") || "ar";
+
+function applyLanguage(lang) {
+  const data = dictionary[lang];
+  
+  // تطبيق الاتجاه واللغة
+  document.documentElement.setAttribute("dir", data.dir);
+  document.documentElement.setAttribute("lang", lang);
+  
+  // استبدال النصوص
+  document.getElementById("lang-btn").innerText = data.langBtn;
+  document.getElementById("main-title").innerText = data.mainTitle;
+  document.getElementById("main-desc").innerText = data.mainDesc;
+  document.getElementById("compare-title").innerText = data.compareTitle;
+  document.getElementById("compare-desc").innerText = data.compareDesc;
+  document.getElementById("bad-title").innerText = data.badTitle;
+  document.getElementById("bad-desc").innerText = data.badDesc;
+  document.getElementById("bad-btn-text").innerText = data.badBtnText;
+  document.getElementById("bad-result").innerText = data.badResult;
+  document.getElementById("good-title").innerText = data.goodTitle;
+  document.getElementById("good-desc").innerText = data.goodDesc;
+  document.getElementById("good-btn-text").innerText = data.goodBtnText;
+  document.getElementById("good-result").innerText = data.goodResult;
+  document.getElementById("info-title").innerText = data.infoTitle;
+  document.getElementById("info-desc").innerText = data.infoDesc;
+  document.getElementById("back-btn").innerText = data.backBtn;
+}
+
+// دالة التحويل مع إفكت الضبابية الاحترافي بالتزامن
+function toggleLang() {
+  // تغشية الشاشة بالضبابية
+  document.body.style.setProperty('--blur-amount', '12px');
+  
+  setTimeout(() => {
+    // قلب اللغة والبيانات أثناء الـ Blur
+    currentLang = currentLang === "ar" ? "en" : "ar";
+    localStorage.setItem("calc_lang", currentLang);
+    applyLanguage(currentLang);
+    
+    // إزالة الضبابية تدريجياً لظهور النص الجديد بشكل ممتاز
+    setTimeout(() => { 
+      document.body.style.setProperty('--blur-amount', '0px'); 
+    }, 150);
+  }, 200);
+}
+
+// تشغيل النظام وتحديد اللغة عند تحميل الصفحة
+window.onload = function() {
+  applyLanguage(currentLang);
+};
+</script>
 </body>
 </html>
