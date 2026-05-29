@@ -11,10 +11,32 @@
   --card-bg: rgba(25, 25, 28, 0.7);
   --border-color: rgba(0, 255, 255, 0.2);
   --text-sec: #94a3b8;
+  --blur-amount: 0px; /* متغير التحكم في تأثير الضبابية */
 }
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-body { background: var(--bg-dark); color: white; padding: 40px 5%; min-height: 100vh; }
+
+body { 
+  background: var(--bg-dark); 
+  color: white; 
+  padding: 40px 5%; 
+  min-height: 100vh; 
+  position: relative;
+  /* إضافة الفلتر لتنفيذ الإفكت بسلاسة */
+  filter: blur(var(--blur-amount));
+  transition: filter 0.4s ease, background 0.5s ease, color 0.5s ease;
+}
+
 .container { max-width: 800px; margin: 0 auto; }
+
+/* زر تبديل اللغة العلوي */
+.lang-switcher-container { display: flex; justify-content: flex-end; margin-bottom: 20px; }
+.btn-lang {
+  background: var(--card-bg); border: 1px solid var(--border-color); color: white;
+  padding: 8px 16px; border-radius: 30px; cursor: pointer; font-size: 14px; font-weight: 600;
+  transition: 0.3s;
+}
+.btn-lang:hover { border-color: #ff00cc; box-shadow: 0 0 10px rgba(255,0,204,0.3); transform: scale(1.05); }
+
 .header { text-align: center; margin-bottom: 40px; }
 .header h1 { font-size: 35px; margin-bottom: 10px; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-size: 200%; }
 .box { background: var(--card-bg); border: 1px solid var(--border-color); padding: 30px; border-radius: 16px; margin-bottom: 25px; box-shadow: 0 0 15px rgba(0,255,255,0.05); }
@@ -25,7 +47,7 @@ p { color: var(--text-sec); line-height: 1.6; font-size: 15px; }
 label { display: block; margin-bottom: 8px; font-weight: bold; color: #fff; }
 select, input[type="range"] { width: 100%; padding: 12px; background: #13131a; border: 1px solid var(--border-color); border-radius: 8px; color: white; font-size: 15px; outline: none; }
 .checkbox-label { display: flex; align-items: center; gap: 10px; cursor: pointer; color: var(--text-sec); margin-top: 10px; }
-.checkbox-label input { width: 18px; height: 18px; accent-color: #00ffff; }
+.checkbox-label input { width: 18px; height: 18px; accent-color: #00ffff; flex-shrink: 0; }
 .result-box { background: rgba(0, 255, 255, 0.1); border: 1px dashed #00ffff; padding: 20px; border-radius: 8px; text-align: center; margin-top: 20px; }
 .price-tag { font-size: 28px; color: #00ffff; font-weight: bold; margin: 5px 0; }
 
@@ -36,51 +58,143 @@ select, input[type="range"] { width: 100%; padding: 12px; background: #13131a; b
 <body>
 
 <div class="container">
+  <!-- منطقة تبديل اللغة -->
+  <div class="lang-switcher-container">
+    <button class="btn-lang" id="lang-btn" onclick="toggleLang()">🌐 EN</button>
+  </div>
+
   <div class="header">
-    <h1>🌐 مساعد تخطيط وتصميم المواقع</h1>
-    <p>استخدم الأداة الذكية بالأسفل لمساعدتك في تقدير حجم كلفة ووقت مشروعك تلقائياً.</p>
+    <h1 id="main-title">🌐 مساعد تخطيط وتصميم المواقع</h1>
+    <p id="main-desc">استخدم الأداة الذكية بالأسفل لمساعدتك في تقدير حجم كلفة ووقت مشروعك تلقائياً.</p>
   </div>
 
   <div class="box">
-    <h2>🧮 حاسبة الميزانية والوقت التقديرية</h2>
-    <p style="margin-bottom: 20px;">قم بتغيير الخيارات بناءً على ما تحتاجه في موقعك وسيقوم النظام بحساب التكلفة والزمن فوراً:</p>
+    <h2 id="calc-title">🧮 حاسبة الميزانية والوقت التقديرية</h2>
+    <p id="calc-desc" style="margin-bottom: 20px;">قم بتغيير الخيارات بناءً على ما تحتاجه في موقعك وسيقوم النظام بحساب التكلفة والزمن فوراً:</p>
     
     <div class="calc-group">
-      <label>حجم الموقع المطلوبة (عدد الصفحات):</label>
+      <label id="label-pages">حجم الموقع المطلوبة (عدد الصفحات):</label>
       <select id="pages" onchange="calculateProject()">
-        <option value="1">صفحة واحدة تعريفية (Landing Page)</option>
-        <option value="5">موقع تعريفي متكامل (حتى 5 صفحات)</option>
-        <option value="10">موقع كبير أو متجر خدمات (حتى 10 صفحات)</option>
+        <option value="1" id="opt-p1">صفحة واحدة تعريفية (Landing Page)</option>
+        <option value="5" id="opt-p5">موقع تعريفي متكامل (حتى 5 صفحات)</option>
+        <option value="10" id="opt-p10">موقع كبير أو متجر خدمات (حتى 10 صفحات)</option>
       </select>
     </div>
 
     <div class="calc-group">
-      <label class="checkbox-label">
+      <label class="checkbox-label" id="label-seo">
         <input type="checkbox" id="seo" onchange="calculateProject()">
-        إضافة تهيئة محركات البحث التنافسية (SEO) للظهور في جوجل
+        <span>إضافة تهيئة محركات البحث التنافسية (SEO) للظهور في جوجل</span>
       </label>
-      <label class="checkbox-label">
+      <label class="checkbox-label" id="label-support">
         <input type="checkbox" id="support" onchange="calculateProject()">
-        إضافة دعم فني وضمان شامل لمدة 3 أشهر مجاناً
+        <span>إضافة دعم فني وضمان شامل لمدة 3 أشهر مجاناً</span>
       </label>
     </div>
 
     <div class="result-box">
-      <div>التكلفة التقديرية لمشروعك:</div>
+      <div id="text-est-cost">التكلفة التقديرية لمشروعك:</div>
       <div class="price-tag" id="total-price">$75</div>
-      <div style="font-size: 14px; color: var(--text-sec);">الوقت المتوقع للتسليم: <span id="delivery-time" style="color: #fff; font-weight: bold;">4 أيام</span></div>
+      <div style="font-size: 14px; color: var(--text-sec);" id="text-delivery-wrapper">الوقت المتوقع للتسليم: <span id="delivery-time" style="color: #fff; font-weight: bold;">4 أيام</span></div>
     </div>
   </div>
 
   <div class="box">
-    <h2>ℹ️ كيف تساعدك هذه الخدمة?</h2>
-    <p>نحن لا نصمم واجهات عشوائية، بل نساعد عملك على النمو من خلال بناء موقع سريع جداً يفضله محرك البحث جوجل، مما يسهل على زبائنك الوصول إليك من أي هاتف أو جهاز كمبيوتر دون أي مشاكل تقنية.</p>
+    <h2 id="info-title">ℹ️ كيف تساعدك هذه الخدمة؟</h2>
+    <p id="info-desc">نحن لا نصمم واجهات عشوائية، بل نساعد عملك على النمو من خلال بناء موقع سريع جداً يفضله محرك البحث جوجل، مما يسهل على زبائنك الوصول إليك من أي هاتف أو جهاز كمبيوتر دون أي مشاكل تقنية.</p>
   </div>
 
-  <center><a href="index.html" class="back-btn">← العودة للرئيسية</a></center>
+  <center><a href="index.html" class="back-btn" id="back-btn">← العودة للرئيسية</a></center>
 </div>
 
 <script>
+const dictionary = {
+  ar: {
+    dir: "rtl",
+    langBtn: "🌐 EN",
+    mainTitle: "🌐 مساعد تخطيط وتصميم المواقع",
+    mainDesc: "استخدم الأداة الذكية بالأسفل لمساعدتك في تقدير حجم كلفة ووقت مشروعك تلقائياً.",
+    calcTitle: "🧮 حاسبة الميزانية والوقت التقديرية",
+    calcDesc: "قم بتغيير الخيارات بناءً على ما تحتاجه في موقعك وسيقوم النظام بحساب التكلفة والزمن فوراً:",
+    labelPages: "حجم الموقع المطلوبة (عدد الصفحات):",
+    optP1: "صفحة واحدة تعريفية (Landing Page)",
+    optP5: "موقع تعريفي متكامل (حتى 5 صفحات)",
+    optP10: "موقع كبير أو متجر خدمات (حتى 10 صفحات)",
+    labelSeo: "إضافة تهيئة محركات البحث التنافسية (SEO) للظهور في جوجل",
+    labelSupport: "إضافة دعم فني وضمان شامل لمدة 3 أشهر مجاناً",
+    textEstCost: "التكلفة التقديرية لمشروعك:",
+    textDeliveryWrapper: "الوقت المتوقع للتسليم: ",
+    daysSuffix: " أيام",
+    infoTitle: "ℹ️ كيف تساعدك هذه الخدمة؟",
+    infoDesc: "نحن لا نصمم واجهات عشوائية، بل نساعد عملك على النمو من خلال بناء موقع سريع جداً يفضله محرك البحث جوجل، مما يسهل على زبائنك الوصول إليك من أي هاتف أو جهاز كمبيوتر دون أي مشاكل تقنية.",
+    backBtn: "← العودة للرئيسية"
+  },
+  en: {
+    dir: "ltr",
+    langBtn: "🌐 AR",
+    mainTitle: "🌐 Web Design & Planning Assistant",
+    mainDesc: "Use the smart tool below to automatically estimate the cost and timeline of your project.",
+    calcTitle: "🧮 Estimated Budget & Time Calculator",
+    calcDesc: "Modify the options based on your requirements, and the system will instantly calculate the cost and timeline:",
+    labelPages: "Required Website Size (Number of Pages):",
+    optP1: "Single Landing Page Package",
+    optP5: "Complete Corporate Site (Up to 5 Pages)",
+    optP10: "Large Site or E-Commerce Store (Up to 10 Pages)",
+    labelSeo: "Add competitive Search Engine Optimization (SEO) to rank on Google",
+    labelSupport: "Add dedicated support & full warranty for 3 months free",
+    textEstCost: "Estimated cost for your project:",
+    textDeliveryWrapper: "Expected delivery time: ",
+    daysSuffix: " Days",
+    infoTitle: "ℹ️ How does this service help you?",
+    infoDesc: "We don't just design random interfaces; we help your business scale by building lightning-fast websites favored by Google's search algorithms, making it effortless for customers to reach you via mobile or desktop seamlessly.",
+    backBtn: "Back to Home →"
+  }
+};
+
+let currentLang = localStorage.getItem("calc_lang") || "ar";
+
+function applyLanguage(lang) {
+  const data = dictionary[lang];
+  document.documentElement.setAttribute("dir", data.dir);
+  document.documentElement.setAttribute("lang", lang);
+  
+  document.getElementById("lang-btn").innerText = data.langBtn;
+  document.getElementById("main-title").innerText = data.mainTitle;
+  document.getElementById("main-desc").innerText = data.mainDesc;
+  document.getElementById("calc-title").innerText = data.calcTitle;
+  document.getElementById("calc-desc").innerText = data.calcDesc;
+  document.getElementById("label-pages").innerText = data.labelPages;
+  document.getElementById("opt-p1").innerText = data.optP1;
+  document.getElementById("opt-p5").innerText = data.optP5;
+  document.getElementById("opt-p10").innerText = data.optP10;
+  document.querySelector("#label-seo span").innerText = data.labelSeo;
+  document.querySelector("#label-support span").innerText = data.labelSupport;
+  document.getElementById("text-est-cost").innerText = data.textEstCost;
+  document.getElementById("info-title").innerText = data.infoTitle;
+  document.getElementById("info-desc").innerText = data.infoDesc;
+  document.getElementById("back-btn").innerText = data.backBtn;
+  
+  calculateProject();
+}
+
+// دالة التبديل مع إضافة تأثير الأنيميشن والـ Blur المتوافق مع الـ index
+function toggleLang() {
+  // 1. تفعيل الضبابية العالية فوراً
+  document.body.style.setProperty('--blur-amount', '12px');
+  
+  setTimeout(() => {
+    // 2. تغيير اللغة والاتجاه أثناء اختفاء النصوص خلف الضبابية
+    currentLang = currentLang === "ar" ? "en" : "ar";
+    localStorage.setItem("calc_lang", currentLang);
+    applyLanguage(currentLang);
+    
+    // 3. إعادة إيضاح الشاشة بالتدريج لإنهاء الإفكت البصري
+    setTimeout(() => { 
+      document.body.style.setProperty('--blur-amount', '0px'); 
+    }, 150);
+  }, 200); // وقت انتظار الذروة لقلب المحتوى
+}
+
 function calculateProject() {
   let pages = parseInt(document.getElementById('pages').value);
   let hasSEO = document.getElementById('seo').checked;
@@ -97,8 +211,15 @@ function calculateProject() {
   if(hasSupport) { basePrice += 100; }
 
   document.getElementById('total-price').innerText = "$" + basePrice;
-  document.getElementById('delivery-time').innerText = days + " أيام";
+  
+  const wrapperText = dictionary[currentLang].textDeliveryWrapper;
+  const suffix = dictionary[currentLang].daysSuffix;
+  document.getElementById('text-delivery-wrapper').innerHTML = wrapperText + `<span id="delivery-time" style="color: #fff; font-weight: bold;">${days}${suffix}</span>`;
 }
+
+window.onload = function() {
+  applyLanguage(currentLang);
+};
 </script>
 </body>
 </html>
