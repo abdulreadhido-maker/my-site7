@@ -18,33 +18,57 @@
             --cyan: #00ffff;
             --pink: #ff00cc;
             --green: #00ff88;
+            --blur-amount: 0px; /* متغير التحكم في تأثير الضبابية للتحويل */
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         html { scroll-behavior: smooth; }
-        body { background: var(--bg-dark); color: var(--text-main); min-height: 100vh; padding: 120px 8% 60px; position: relative; overflow-x: hidden; }
+        body { 
+            background: var(--bg-dark); 
+            color: var(--text-main); 
+            min-height: 100vh; 
+            padding: 120px 8% 60px; 
+            position: relative; 
+            overflow-x: hidden;
+            filter: blur(var(--blur-amount));
+            transition: filter 0.4s ease, background 0.5s ease;
+        }
         body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 50% 50%, rgba(255, 0, 204, 0.02), transparent 75%); z-index: -1; }
 
-        .back-home { position: fixed; top: 30px; left: 8%; padding: 12px 28px; background: var(--card-bg); border: 1px solid var(--border-color); color: #fff; text-decoration: none; border-radius: 30px; font-weight: 600; font-size: 14px; backdrop-filter: blur(10px); transition: 0.3s; z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        /* الأزرار العلوية المستقرة */
+        .top-nav-bar { position: fixed; top: 30px; left: 8%; right: 8%; display: flex; justify-content: space-between; align-items: center; z-index: 1000; }
+        .back-home { padding: 12px 28px; background: var(--card-bg); border: 1px solid var(--border-color); color: #fff; text-decoration: none; border-radius: 30px; font-weight: 600; font-size: 14px; backdrop-filter: blur(10px); transition: 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
         .back-home:hover { border-color: var(--pink); box-shadow: 0 0 15px var(--pink); transform: translateY(-2px); }
+        
+        .btn-lang {
+            background: var(--card-bg); border: 1px solid var(--border-color); color: white;
+            padding: 12px 24px; border-radius: 30px; cursor: pointer; font-size: 14px; font-weight: 600;
+            backdrop-filter: blur(10px); transition: 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        .btn-lang:hover { border-color: var(--cyan); box-shadow: 0 0 15px var(--cyan); transform: translateY(-2px); }
 
         .header-area { text-align: center; margin-bottom: 60px; }
         .header-area h1 { font-size: clamp(32px, 5vw, 46px); font-weight: 900; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-size: 300%; animation: gradientShift 5s infinite linear; }
         .header-area p { color: var(--secondary); font-size: 17px; margin-top: 15px; max-width: 700px; margin-left: auto; margin-right: auto; line-height: 1.6; }
 
-        /* فهرس التنقل السريع للوصول الفوري للأقسام المعنية */
+        /* فهرس التنقل السريع */
         .quick-nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-bottom: 60px; }
         .quick-nav a { padding: 12px 24px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); color: var(--secondary); text-decoration: none; border-radius: 30px; font-size: 14px; font-weight: 600; transition: all 0.3s ease; }
         .quick-nav a:hover { color: #fff; border-color: var(--cyan); box-shadow: 0 0 15px rgba(0,255,255,0.3); transform: translateY(-2px); }
 
-        .guide-section { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 24px; padding: 40px; margin-bottom: 50px; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); transition: opacity 0.6s ease, transform 0.6s ease; scroll-margin-top: 100px; }
+        .guide-section { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 24px; padding: 40px; margin-bottom: 50px; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); transition: opacity 0.6s ease, transform 0.6s ease; scroll-margin-top: 120px; }
         .section-title { font-size: 26px; font-weight: 800; color: #fff; margin-bottom: 25px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 15px; }
         .section-title span { background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
         .steps-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
         .step-item { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 25px; border-radius: 16px; position: relative; transition: 0.3s; }
         .step-item:hover { transform: translateY(-4px); background: rgba(255,255,255,0.04); border-color: rgba(0,255,255,0.2); }
-        .step-num { font-size: 32px; font-weight: 900; color: rgba(255,255,255,0.07); position: absolute; top: 15px; left: 20px; font-style: italic; }
+        
+        /* ضبط تموضع أرقام وحروف الخطوات البرمجية للـ LTR والـ RTL تلقائياً */
+        html[dir="rtl"] .step-num { left: 20px; right: auto; font-style: italic; }
+        html[dir="ltr"] .step-num { right: 20px; left: auto; font-style: italic; }
+        .step-num { font-size: 32px; font-weight: 900; color: rgba(255, 255, 255, 0.07); position: absolute; top: 15px; }
+        
         .step-item h4 { font-size: 18px; color: #fff; margin-bottom: 10px; }
         .step-item p { font-size: 14px; color: var(--secondary); line-height: 1.6; }
 
@@ -58,80 +82,85 @@
         .tool-card p { font-size: 13px; color: var(--secondary); }
         .tool-btn { display: inline-block; margin-top: 20px; padding: 8px 20px; background: var(--primary-gradient); border-radius: 30px; color: #fff; font-size: 13px; font-weight: bold; }
 
-        /* أداة قياس الجاهزية الذكية الجديدة */
+        /* أداة قياس الجاهزية الذكية */
         .checker-box { background: rgba(10, 10, 12, 0.4); border: 1px dashed rgba(0, 255, 255, 0.2); border-radius: 16px; padding: 25px; margin-top: 20px; }
         .checker-option { display: flex; align-items: center; gap: 12px; margin-bottom: 15px; cursor: pointer; font-size: 15px; color: var(--secondary); transition: 0.2s; }
         .checker-option:hover { color: #fff; }
-        .checker-option input { width: 18px; height: 18px; accent-color: var(--cyan); cursor: pointer; }
+        .checker-option input { width: 18px; height: 18px; accent-color: var(--cyan); cursor: pointer; flex-shrink: 0; }
         .checker-result { margin-top: 25px; padding: 20px; border-radius: 12px; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); text-align: center; display: none; }
         .checker-score { font-size: 24px; font-weight: 800; color: var(--green); margin-bottom: 5px; }
 
         @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
         @media (max-width: 768px) {
-            body { padding-top: 100px; padding-left: 5%; padding-right: 5%; }
-            .back-home { position: absolute; top: 20px; left: 5%; padding: 8px 20px; }
+            body { padding-top: 140px; padding-left: 5%; padding-right: 5%; }
+            .top-nav-bar { position: absolute; top: 20px; left: 5%; right: 5%; gap: 10px; }
+            .back-home, .btn-lang { padding: 8px 16px; font-size: 13px; }
             .guide-section { padding: 25px; }
         }
     </style>
 </head>
 <body>
 
-<a href="index.html" class="back-home">← العودة للرئيسية</a>
+<!-- شريط الملاحة والتبديل العلوي المستقر -->
+<div class="top-nav-bar">
+    <a href="index.html" class="back-home" id="back-btn">← العودة للرئيسية</a>
+    <button class="btn-lang" id="lang-btn" onclick="toggleLang()">🌐 EN</button>
+</div>
 
 <div class="header-area animate__animated animate__fadeInDown">
-    <h1>مركز Torrema التعليمي والاستشاري</h1>
-    <p>بنيتنا الاستشارية المنظمة لمساعدتك في فهم خطط سير وهندسة الأنظمة والتطبيقات البرمجية الذكية.</p>
+    <h1 id="main-title">مركز Torrema Educational & Advisory Center</h1>
+    <p id="main-desc">بنيتنا الاستشارية المنظمة لمساعدتك في فهم خطط سير وهندسة الأنظمة والتطبيقات البرمجية الذكية.</p>
 </div>
 
 <div class="quick-nav animate__animated animate__fadeIn">
-    <a href="#what-must">📋 ماذا يجب عليك؟</a>
-    <a href="#project-checker">⚡ فاحص جاهزية المشروع</a>
-    <a href="#how-we-do">⚙️ كيف نبني؟</a>
-    <a href="#wireframe-sec">📐 التخطيط والبنية</a>
-    <a href="#support-sec">🛡️ المساعدات والدعم</a>
-    <a href="#interactive-tools">🛠️ المختبر والأدوات التفاعلية</a>
+    <a href="#what-must" id="nav-1">📋 ماذا يجب عليك؟</a>
+    <a href="#project-checker" id="nav-2">⚡ فاحص جاهزية المشروع</a>
+    <a href="#how-we-do" id="nav-3">⚙️ كيف نبني؟</a>
+    <a href="#wireframe-sec" id="nav-4">📐 التخطيط والبنية</a>
+    <a href="#support-sec" id="nav-5">🛡️ المساعدات والدعم</a>
+    <a href="#interactive-tools" id="nav-6">🛠️ المختبر والأدوات التفاعلية</a>
 </div>
 
 <div id="what-must" class="guide-section">
-    <div class="section-title"><span>📋 ماذا يجب عليك فعله قبل بدء مشروعك؟</span></div>
+    <div class="section-title"><span id="title-must">📋 ماذا يجب عليك فعله قبل بدء مشروعك؟</span></div>
     <div class="steps-list">
         <div class="step-item">
             <div class="step-num">01</div>
-            <h4>تحديد الأهداف الاستراتيجية</h4>
-            <p>يجب معرفة الغرض من النظام؛ هل هو لجمع العملاء المتوقعين، بيع منتجات رقمية، أم لإدارة عمليات داخلية معقدة؟</p>
+            <h4 id="must-h1">تحديد الأهداف الاستراتيجية</h4>
+            <p id="must-p1">يجب معرفة الغرض من النظام؛ هل هو لجمع العملاء المتوقعين، بيع منتجات رقمية، أم لإدارة عمليات داخلية معقدة؟</p>
         </div>
         <div class="step-item">
             <div class="step-num">02</div>
-            <h4>تحضير المحتوى والهوية</h4>
-            <p>تجهيز النصوص الأساسية للموقع، الشعار (Logo)، الألوان المفضلة، وصور المنتجات لضمان تسريع وثيرة التنفيذ البرمجي.</p>
+            <h4 id="must-h2">تحضير المحتوى والهوية</h4>
+            <p id="must-p2">تجهيز النصوص الأساسية للموقع، الشعار (Logo)، الألوان المفضلة، وصور المنتجات لضمان تسريع وثيرة التنفيذ البرمجي.</p>
         </div>
         <div class="step-item">
             <div class="step-num">03</div>
-            <h4>فهم فئة المستخدمين</h4>
-            <p>دراسة سلوك زوار موقعك ومعرفة الأجهزة الأكثر استخداماً لديهم لتكييف واجهة المستخدم بناءً على رغباتهم الحقيقية.</p>
+            <h4 id="must-h3">فهم فئة المستخدمين</h4>
+            <p id="must-p3">دراسة سلوك زوار موقعك ومعرفة الأجهزة الأكثر استخداماً لديهم لتكييف واجهة المستخدم بناءً على رغباتهم الحقيقية.</p>
         </div>
     </div>
 </div>
 
 <div id="project-checker" class="guide-section">
-    <div class="section-title"><span>⚡ مستشار Torrema الآلي لجاهزية فكرتك</span></div>
-    <p style="color: var(--secondary); font-size: 15px; margin-bottom: 20px; line-height: 1.6;">حدد العناصر التي قمت بإعدادها بالفعل حتى الآن، لتقوم خوارزمية الموقع بحساب نسبة استعداد مشروعك للانطلاق البرمجي الفعلي فوراً:</p>
+    <div class="section-title"><span id="title-checker">⚡ مستشار Torrema الآلي لجاهزية فكرتك</span></div>
+    <p id="desc-checker" style="color: var(--secondary); font-size: 15px; margin-bottom: 20px; line-height: 1.6;">حدد العناصر التي قمت بإعدادها بالفعل حتى الآن، لتقوم خوارزمية الموقع بحساب نسبة استعداد مشروعك للانطلاق البرمجي الفعلي فوراً:</p>
     
     <div class="checker-box">
-        <label class="checker-option">
+        <label class="checker-option" id="opt-c1">
             <input type="checkbox" class="check-item" value="25" onchange="runCheckReady()">
             <span>لدي فكرة واضحة ومكتوبة ومحددة الأهداف بدقة.</span>
         </label>
-        <label class="checker-option">
+        <label class="checker-option" id="opt-c2">
             <input type="checkbox" class="check-item" value="25" onchange="runCheckReady()">
             <span>قمت بتجهيز النصوص الأساسية أو اللوجو الخاص بالهوية.</span>
         </label>
-        <label class="checker-option">
+        <label class="checker-option" id="opt-c3">
             <input type="checkbox" class="check-item" value="25" onchange="runCheckReady()">
             <span>أعرف بالضبط من هم المنافسون وما الميزة التي سأقدمها.</span>
         </label>
-        <label class="checker-option">
+        <label class="checker-option" id="opt-c4">
             <input type="checkbox" class="check-item" value="25" onchange="runCheckReady()">
             <span>رصدت الميزانية التقديرية لبدء العمل والإنفاق على السيرفرات والتسويق.</span>
         </label>
@@ -144,124 +173,314 @@
 </div>
 
 <div id="how-we-do" class="guide-section">
-    <div class="section-title"><span>⚙️ كيف نقوم بهندسة وبناء أنظمتك؟</span></div>
+    <div class="section-title"><span id="title-how">⚙️ كيف نقوم بهندسة وبناء أنظمتك؟</span></div>
     <div class="steps-list">
-        <div class="step-item" style="border-right: 3px solid var(--pink);">
+        <div class="step-item" style="border-right: 3px solid var(--pink); border-left: none;">
             <div class="step-num">A</div>
-            <h4>التحليل والنمذجة</h4>
-            <p>نقوم بأخذ متطلباتك وتحويلها إلى مخطط تدفق برمي متكامل (Flowchart) يوضح حركة البيانات بدقة بالغة.</p>
+            <h4 id="how-h1">التحليل والنمذجة</h4>
+            <p id="how-p1">نقوم بأخذ متطلباتك وتحويلها إلى مخطط تدفق برمي متكامل (Flowchart) يوضح حركة البيانات بدقة بالغة.</p>
         </div>
-        <div class="step-item" style="border-right: 3px solid var(--cyan);">
+        <div class="step-item" style="border-right: 3px solid var(--cyan); border-left: none;">
             <div class="step-num">B</div>
-            <h4>البرمجة وفحص الأمان الحرج</h4>
-            <p>نكتب الأكواد البرمجية بأحدث معايير الأمان (Clean Code) ونمررها عبر ماسحات برمجية لاكتشاف وحل ثغرات حقن البيانات.</p>
+            <h4 id="how-h2">البرمجة وفحص الأمان الحرج</h4>
+            <p id="how-p2">نكتب الأكواد البرمجية بأحدث معايير الأمان (Clean Code) ونمررها عبر ماسحات برمجية لاكتشاف وحل ثغرات حقن البيانات.</p>
         </div>
-        <div class="step-item" style="border-right: 3px solid var(--green);">
+        <div class="step-item" style="border-right: 3px solid var(--green); border-left: none;">
             <div class="step-num">C</div>
-            <h4>الإطلاق والنشر السحابي</h4>
-            <p>نرفع مشروعك على سيرفرات سحابية فائقة السرعة مهيأة ومجهزة لتحمل آلاف الزوار المتزامنين في نفس اللحظة.</p>
+            <h4 id="how-h3">الإطلاق والنشر السحابي</h4>
+            <p id="how-p3">نرفع مشروعك على سيرفرات سحابية فائقة السرعة مهيأة ومجهزة لتحمل آلاف الزوار المتزامنين في نفس اللحظة.</p>
         </div>
     </div>
 </div>
 
 <div id="wireframe-sec" class="guide-section">
-    <div class="section-title"><span>📐 التخطيط السلكي (Wireframing) والبنية</span></div>
-    <p style="color: var(--secondary); margin-bottom: 25px; line-height: 1.6; font-size: 15px;">
+    <div class="section-title"><span id="title-wire">📐 التخطيط السلكي (Wireframing) والبنية</span></div>
+    <p id="desc-wire" style="color: var(--secondary); margin-bottom: 25px; line-height: 1.6; font-size: 15px;">
         التخطيط السلكي هو الهيكل العظمي الأسود والأبيض لمشروعك قبل إضافة الألوان. يساعدنا التخطيط في وضع كل زر، نموذج، وصورة في مكانها الصحيح استناداً إلى سيكولوجية الزائر، مما يرفع من معدل التحويل والمبيعات بشكل هائل.
     </p>
     <div class="steps-list">
         <div class="step-item">
-            <h4>ترتيب العناصر بصرياً</h4>
-            <p>وضع العناصر الأهم (مثل زر اتخاذ القرار) في أعلى الصفحة لضمان رؤيتها مباشرة دون الحاجة للتمرير الطويل.</p>
+            <h4 id="wire-h1">ترتيب العناصر بصرياً</h4>
+            <p id="wire-p1">وضع العناصر الأهم (مثل زر اتخاذ القرار) في أعلى الصفحة لضمان رؤيتها مباشرة دون الحاجة للتمرير الطويل.</p>
         </div>
         <div class="step-item">
-            <h4>قواعد البيانات السحابية</h4>
-            <p>تخطيط الجداول العلائقية وفصل بيانات المستخدمين الحساسة وتشفيرها لمنع أي تسريبات مستقبلية.</p>
+            <h4 id="wire-h2">قواعد البيانات السحابية</h4>
+            <p id="wire-p2">تخطيط الجداول العلائقية وفصل بيانات المستخدمين الحساسة وتشفيرها لمنع أي تسريبات مستقبلية.</p>
         </div>
     </div>
 </div>
 
 <div id="support-sec" class="guide-section">
-    <div class="section-title"><span>🛡️ نظام المساعدات والصيانة الشاملة</span></div>
+    <div class="section-title"><span id="title-support">🛡️ نظام المساعدات والصيانة الشاملة</span></div>
     <div class="steps-list">
         <div class="step-item">
-            <h4>المراقبة المستمرة (24/7)</h4>
-            <p>نظام ذكي يقوم بمراقبة السيرفر وإرسال تنبيهات تلقائية في حال حدوث أي ضغط غير طبيعي لحل المشكلة فوراً.</p>
+            <h4 id="sup-h1">المراقبة المستمرة (24/7)</h4>
+            <p id="sup-p1">نظام ذكي يقوم بمراقبة السيرفر وإرسال تنبيهات تلقائية في حال حدوث أي ضغط غير طبيعي لحل المشكلة فوراً.</p>
         </div>
         <div class="step-item">
-            <h4>النسخ الاحتياطي التلقائي</h4>
-            <p>يتم أخذ نسخ احتياطية دورية (يومية وأسبوعية) من ملفات مشروعك وقواعد البيانات وتخزينها في سيرفرات منفصلة تماماً.</p>
+            <h4 id="sup-h2">النسخ الاحتياطي التلقائي</h4>
+            <p id="sup-p2">يتم أخذ نسخ احتياطية دورية (يومية وأسبوعية) من ملفات مشروعك وقواعد البيانات وتخزينها في سيرفرات منفصلة تماماً.</p>
         </div>
         <div class="step-item">
-            <h4>التحديثات البرمجية الدورية</h4>
-            <p>تحديث المكتبات البرمجية وسد الثغرات المكتشفة عالمياً لضمان صمود موقعك أمام هجمات الحرمان من الخدمة (DDoS).</p>
+            <h4 id="sup-h3">التحديثات البرمجية الدورية</h4>
+            <p id="sup-p3">تحديث المكتبات البرمجية وسد الثغرات المكتشفة عالمياً لضمان صمود موقعك أمام هجمات الحرمان من الخدمة (DDoS).</p>
         </div>
     </div>
 </div>
 
 <div id="interactive-tools" class="guide-section" style="border: 1px dashed var(--cyan);">
-    <div class="section-title" style="border: none; margin-bottom: 10px;"><span>🛠️ المختبر البرمجي التفاعلي للأدوات</span></div>
-    <p style="color: var(--secondary); font-size: 14px; margin-bottom: 25px;">انقر على أي أداة بالأسفل لتجربتها عملياً بملفها المنفصل الخاص والمستقر:</p>
+    <div class="section-title" style="border: none; margin-bottom: 10px;"><span id="title-tools">🛠️ المختبر البرمجي التفاعلي للأدوات</span></div>
+    <p id="desc-tools" style="color: var(--secondary); font-size: 14px; margin-bottom: 25px;">انقر على أي أداة بالأسفل لتجربتها عملياً بملفها المنفصل الخاص والمستقر:</p>
     <div class="tools-grid">
         <a href="web.html" class="tool-link">
             <div class="tool-card">
                 <div class="tool-icon">📊</div>
-                <h4>حاسبة الأسعار الذكية</h4>
-                <p>احسب التكلفة التقديرية ووقت التسليم المتوقع لموقعك بدقة كاملة.</p>
-                <span class="tool-btn">دخول الحاسبة</span>
+                <h4 id="tl-h1">حاسبة الأسعار الذكية</h4>
+                <p id="tl-p1">احسب التكلفة التقديرية ووقت التسليم المتوقع لموقعك بدقة كاملة.</p>
+                <span class="tool-btn" id="tl-b1">دخول الحاسبة</span>
             </div>
         </a>
         <a href="dev.html" class="tool-link">
             <div class="tool-card">
                 <div class="tool-icon">🛡️</div>
-                <h4>ماسح الأمان السحابي الفعلي</h4>
-                <p>قم باختبار جودة الكود المصدر واكتشاف الثغرات الأمنية الحرجة فوراً.</p>
-                <span class="tool-btn">تشغيل الماسح Security</span>
+                <h4 id="tl-h2">ماسح الأمان السحابي الفعلي</h4>
+                <p id="tl-p2">قم باختبار جودة الكود المصدر واكتشاف الثغرات الأمنية الحرجة فوراً.</p>
+                <span class="tool-btn" id="tl-b2">تشغيل الماسح Security</span>
             </div>
         </a>
         <a href="uiux.html" class="tool-link">
             <div class="tool-card">
                 <div class="tool-icon">⚖️</div>
-                <h4>مقارن الواجهات البصري</h4>
-                <p>شاهد كيف نصلح الأخطاء البصرية ونحول التصميم العشوائي إلى تحفة فنية مريحة.</p>
-                <span class="tool-btn">تصفح المقارنات UI/UX</span>
+                <h4 id="tl-h3">مقارن الواجهات البصري</h4>
+                <p id="tl-p3">شاهد كيف نصلح الأخطاء البصرية ونحول التصميم العشوائي إلى تحفة فنية مريحة.</p>
+                <span class="tool-btn" id="tl-b3">تصفح المقارنات UI/UX</span>
             </div>
         </a>
     </div>
 </div>
 
 <script>
-    // وظيفة فاحص الاستعداد البرمجي التفاعلي المستحدث
-    function runCheckReady() {
-        let items = document.querySelectorAll('.check-item');
-        let score = 0;
-        items.forEach(el => { if(el.checked) score += parseInt(el.value); });
-        
-        let resultBox = document.getElementById('ready-output');
-        let scoreTxt = document.getElementById('ready-score');
-        let statusTxt = document.getElementById('ready-status');
-        
-        resultBox.style.display = "block";
-        scoreTxt.innerText = score + "%";
-        
-        if(score === 0) {
-            resultBox.style.display = "none";
-        } else if(score <= 25) {
-            scoreTxt.style.color = "#ff00cc";
-            statusTxt.innerText = "فكرتك في البداية تماماً! ننصحك بقراءة قسم (ماذا يجب عليك فعله) بالكامل لترتيب الهيكل الأساسي.";
-        } else if(score <= 50) {
-            scoreTxt.style.color = "#3333ff";
-            statusTxt.innerText = "تقدم جيد! قمت بقطع خطوة ممتازة، ولكن يفضل إعداد العناصر المتبقية لضمان دقة التنفيذ الهندسي.";
-        } else if(score <= 75) {
-            scoreTxt.style.color = "#00ffff";
-            statusTxt.innerText = "مشروعك جاهز بنسبة ممتازة! يمكنك الآن تجربة (حاسبة الأسعار بالأسفل) لأخذ تصور حقيقي عن التكلفة.";
-        } else {
-            scoreTxt.style.color = "#00ff88";
-            statusTxt.innerText = "مذهل! مشروعك جاهز 100% للتطوير الفوري. فكرتك ناضجة ومكتملة المعالم ومستعدة للإطلاق البرمجي في أي وقت!";
-        }
-    }
+// قاموس الكلمات والترجمات التفصيلي للمحتوى والمخرجات البرمجية
+const dictionary = {
+  ar: {
+    dir: "rtl",
+    langBtn: "🌐 EN",
+    backBtn: "← العودة للرئيسية",
+    mainTitle: "مركز Torrema التعليمي والاستشاري",
+    mainDesc: "بنيتنا الاستشارية المنظمة لمساعدتك في فهم خطط سير وهندسة الأنظمة والتطبيقات البرمجية الذكية.",
+    nav1: "📋 ماذا يجب عليك؟", nav2: "⚡ فاحص جاهزية المشروع", nav3: "⚙️ كيف نبني؟", nav4: "📐 التخطيط والبنية", nav5: "🛡️ المساعدات والدعم", nav6: "🛠️ المختبر والأدوات التفاعلية",
+    titleMust: "📋 ماذا يجب عليك فعله قبل بدء مشروعك؟",
+    mustH1: "تحديد الأهداف الاستراتيجية", mustP1: "يجب معرفة الغرض من النظام؛ هل هو لجمع العملاء المتوقعين، بيع منتجات رقمية، أم لإدارة عمليات داخلية معقدة؟",
+    mustH2: "تحضير المحتوى والهوية", mustP2: "تجهيز النصوص الأساسية للموقع، الشعار (Logo)، الألوان المفضلة، وصور المنتجات لضمان تسريع وثيرة التنفيذ البرمجي.",
+    mustH3: "فهم فئة المستخدمين", mustP3: "دراسة سلوك زوار موقعك ومعرفة الأجهزة الأكثر استخداماً لديهم لتكييف واجهة المستخدم بناءً على رغباتهم الحقيقية.",
+    titleChecker: "⚡ مستشار Torrema الآلي لجاهزية فكرتك",
+    descChecker: "حدد العناصر التي قمت بإعدادها بالفعل حتى الآن، لتقوم خوارزمية الموقع بحساب نسبة استعداد مشروعك للانطلاق البرمجي الفعلي فوراً:",
+    optC1: "لدي فكرة واضحة ومكتوبة ومحددة الأهداف بدقة.",
+    optC2: "قمت بتجهيز النصوص الأساسية أو اللوجو الخاص بالهوية.",
+    optC3: "أعرف بالضبط من هم المنافسون وما الميزة التي سأقدمها.",
+    optC4: "رصدت الميزانية التقديرية لبدء العمل والإنفاق على السيرفرات والتسويق.",
+    titleHow: "⚙️ كيف نقوم بهندسة وبناء أنظمتك؟",
+    howH1: "التحليل والنمذجة", howP1: "نقوم بأخذ متطلباتك وتحويلها إلى مخطط تدفق برمي متكامل (Flowchart) يوضح حركة البيانات بدقة بالغة.",
+    howH2: "البرمجة وفحص الأمان الحرج", howP2: "نكتب الأكواد البرمجية بأحدث معايير الأمان (Clean Code) ونمررها عبر ماسحات برمجية لاكتشاف وحل ثغرات حقن البيانات.",
+    howH3: "الإطلاق والنشر السحابي", howP3: "نرفع مشروعك على سيرفرات سحابية فائقة السرعة مهيأة ومجهة لتحمل آلاف الزوار المتزامنين في نفس اللحظة.",
+    titleWire: "📐 التخطيط السلكي (Wireframing) والبنية",
+    descWire: "التخطيط السلكي هو الهيكل العظمي الأسود والأبيض لمشروعك قبل إضافة الألوان. يساعدنا التخطيط في وضع كل زر، نموذج، وصورة في مكانها الصحيح استناداً إلى سيكولوجية الزائر، مما يرفع من معدل التحويل والمبيعات بشكل هائل.",
+    wireH1: "ترتيب العناصر بصرياً", wireP1: "وضع العناصر الأهم (مثل زر اتخاذ القرار) في أعلى الصفحة لضمان رؤيتها مباشرة دون الحاجة للتمرير الطويل.",
+    wireH2: "قواعد البيانات السحابية", wireP2: "تخطيط الجداول العلائقية وفصل بيانات المستخدمين الحساسة وتشفيرها لمنع أي تسريبات مستقبلية.",
+    titleSupport: "🛡️ نظام المساعدات والصيانة الشاملة",
+    supH1: "المراقبة المستمرة (24/7)", supP1: "نظام ذكي يقوم بمراقبة السيرفر وإرسال تنبيهات تلقائية في حال حدوث أي ضغط غير طبيعي لحل المشكلة فوراً.",
+    supH2: "النسخ الاحتياطي التلقائي", supP2: "يتم أخذ نسخ احتياطية دورية (يومية وأسبوعية) من ملفات مشروعك وقواعد البيانات وتخزينها في سيرفرات منفصلة تماماً.",
+    supH3: "التحديثات البرمجية الدورية", supP3: "تحديث المكتبات البرمجية وسد الثغرات المكتشفة عالمياً لضمان صمود موقعك أمام هجمات الحرمان من الخدمة (DDoS).",
+    titleTools: "🛠️ المختبر البرمجي التفاعلي للأدوات",
+    descTools: "انقر على أي أداة بالأسفل لتجربتها عملياً بملفها المنفصل الخاص والمستقر:",
+    tlH1: "حاسبة الأسعار الذكية", tlP1: "احسب التكلفة التقديرية ووقت التسليم المتوقع لموقعك بدقة كاملة.", tlB1: "دخول الحاسبة",
+    tlH2: "ماسح الأمان السحابي الفعلي", tlP2: "قم باختبار جودة الكود المصدر واكتشاف الثغرات الأمنية الحرجة فوراً.", tlB2: "تشغيل الماسح Security",
+    tlH3: "مقارن الواجهات البصري", tlP3: "شاهد كيف نصلح الأخطاء البصرية ونحول التصميم العشوائي إلى تحفة فنية مريحة.", tlB3: "تصفح المقارنات UI/UX",
+    status0: "فكرتك في البداية تماماً! ننصحك بقراءة قسم (ماذا يجب عليك فعله) بالكامل لترتيب الهيكل الأساسي.",
+    status1: "تقدم جيد! قمت بقطع خطوة ممتازة، ولكن يفضل إعداد العناصر المتبقية لضمان دقة التنفيذ الهندسي.",
+    status2: "مشروعك جاهز بنسبة ممتازة! يمكنك الآن تجربة (حاسبة الأسعار بالأسفل) لأخذ تصور حقيقي عن التكلفة.",
+    status3: "مذهل! مشروعك جاهز 100% للتطوير الفوري. فكرتك ناضجة ومكتملة المعالم ومستعدة للإطلاق البرمجي في أي وقت!"
+  },
+  en: {
+    dir: "ltr",
+    langBtn: "🌐 AR",
+    backBtn: "Back to Home →",
+    mainTitle: "Torrema Educational & Advisory Center",
+    mainDesc: "Our structured advisory framework designed to help you comprehend systemic architectures, development workflows, and high-end software solutions.",
+    nav1: "📋 Requirements", nav2: "⚡ Idea Readiness Checker", nav3: "⚙️ Engineering Pipeline", nav4: "📐 Architecture & Wireframes", nav5: "🛡️ SLA & DevOps Support", nav6: "🛠️ Interactive Labs",
+    titleMust: "📋 Critical Actions Before Initiating Code Production",
+    mustH1: "Establish Strategic Milestones", mustP1: "Define the core utility of your infrastructure: Is it built for high-ticket lead acquisition, digital product distribution, or complex back-office automation?",
+    mustH2: "Assets & Brand Preparation", mustP2: "Compile primary legal text hooks, vector logos, color branding codes, and structural assets to exponentially accelerate deployment velocities.",
+    mustH3: "Demographic Mapping", mustP3: "Deconstruct your end-user behavioral loops and identify target access hardware to mold your UI layouts around realistic user friction fields.",
+    titleChecker: "⚡ Torrema Automated Idea Feasibility Engine",
+    descChecker: "Select the foundational blocks you have pre-engineered up to this moment, and our background code will instantly audit your architectural preparation rate:",
+    optC1: "I have structured a well-written, scoped blueprint with explicitly defined goals.",
+    optC2: "I have prepared the core typography datasets, visual brand assets, or vector logos.",
+    optC3: "I have performed competitive audits and know our distinct unfair advantage.",
+    optC4: "I have secured the computational budgets for infrastructure hosting and marketing scaling.",
+    titleHow: "⚙️ How We Engineer & Program Your Codebases",
+    howH1: "Systemic Mapping & Analysis", howP1: "We translate your manual processes into comprehensive, multi-layered data flowcharts clarifying system state logic with mathematical accuracy.",
+    howH2: "Secure Core Programming", howP2: "We write clean, modular scripts conforming to secure architectural principles, streaming code through automated static code scanners.",
+    howH3: "Cloud Cluster Distribution", howP3: "We transition your production build onto high-velocity, fault-tolerant cloud servers structured to sustain thousands of highly concurrent request peaks.",
+    titleWire: "📐 Structural Wireframing & Core Database Layouts",
+    descWire: "Wireframing builds the monochromatic structural skeleton of your ecosystem prior to artistic painting. It governs user eye paths to trigger conversion mechanics scientifically.",
+    wireH1: "Visual Hierarchy Optimization", wireP1: "Positioning primary transactional action components above the fold to guarantee instant conversion accessibility without deep scrolling friction.",
+    wireH2: "Relational DB Engineering", wireP2: "Drafting relational data schemas, segregating sensitive private attributes, and forcing isolated server-side encryption to block leak vectors.",
+    titleSupport: "🛡️ Comprehensive Operational SLA & System Resilience",
+    supH1: "24/7 Monitored Infrastructure", supP1: "Smart synthetic heartbeat scripts monitor compute performance, deploying immediate telemetry notifications to suppress load anomalies instantly.",
+    supH2: "Automated Resilient Backups", supP2: "Executing daily incremental snapshots of application file structures and state instances, shipping records to isolated backup vaults.",
+    supH3: "Continuous Library Hardening", supP3: "Patching framework package trees and closing discovered security disclosures to defend against global high-volume DDoS attacks.",
+    titleTools: "🛠️ Interactive Software Laboratories",
+    descTools: "Execute any operational platform micro-tool below to test its capabilities inside standalone execution files:",
+    tlH1: "Smart Cost Assessment Tool", tlP1: "Audit financial quotes and calculate deployment windows required for your build with granular accuracy.", tlB1: "Access Calculator",
+    tlH2: "Live Cloud Vulnerability Scanner", tlP2: "Test application source layers to flag critical validation risks and cross-site injection vectors instantly.", tlB2: "Launch Security Scanner",
+    tlH3: "Visual UI Layout Comparator", tlP3: "Witness how our engineering standard restructures asymmetric web wireframes into fluid high-converting layouts.", tlB3: "Launch UI/UX Studio",
+    status0: "Your concept is in its absolute infancy. We strongly advise mapping out core system goals via Section 1 before initializing code syntax.",
+    status1: "Solid progression! You have cleared foundational phases, but finalizing the remaining assets is highly recommended to secure development precision.",
+    status2: "Excellent state of engineering readiness! Proceed to the Cost Assessment Tool below to view real-world asset costs.",
+    status3: "Phenomenal! Your architecture is 100% prepared for instant engineering sprints. Your system scope is fully mature and ready for cloud deployment!"
+  }
+};
 
-    // إظهار عناصر الصفحة بسلاسة أثناء التمرير وإصلاح خطأ العرض القديم
+let currentLang = localStorage.getItem("calc_lang") || "ar";
+
+function applyLanguage(lang) {
+  const data = dictionary[lang];
+  
+  // تغيير اتجاهات الصفحة والهياكل البرمجية والحدود التجميلية
+  document.documentElement.setAttribute("dir", data.dir);
+  document.documentElement.setAttribute("lang", lang);
+  
+  const stepItems = document.querySelectorAll('.step-item');
+  stepItems.forEach(item => {
+      if(data.dir === 'rtl') {
+          item.style.borderRight = item.style.borderLeft || item.style.borderRight;
+          item.style.borderLeft = "none";
+      } else {
+          item.style.borderLeft = item.style.borderRight || item.style.borderLeft;
+          item.style.borderRight = "none";
+      }
+  });
+
+  // تحديث نصوص الواجهات بالكامل
+  document.getElementById("lang-btn").innerText = data.langBtn;
+  document.getElementById("back-btn").innerText = data.backBtn;
+  document.getElementById("main-title").innerText = data.mainTitle;
+  document.getElementById("main-desc").innerText = data.mainDesc;
+  
+  document.getElementById("nav-1").innerText = data.nav1;
+  document.getElementById("nav-2").innerText = data.nav2;
+  document.getElementById("nav-3").innerText = data.nav3;
+  document.getElementById("nav-4").innerText = data.nav4;
+  document.getElementById("nav-5").innerText = data.nav5;
+  document.getElementById("nav-6").innerText = data.nav6;
+
+  document.getElementById("title-must").innerText = data.titleMust;
+  document.getElementById("must-h1").innerText = data.mustH1;
+  document.getElementById("must-p1").innerText = data.mustP1;
+  document.getElementById("must-h2").innerText = data.mustH2;
+  document.getElementById("must-p2").innerText = data.mustP2;
+  document.getElementById("must-h3").innerText = data.mustH3;
+  document.getElementById("must-p3").innerText = data.mustP3;
+
+  document.getElementById("title-checker").innerText = data.titleChecker;
+  document.getElementById("desc-checker").innerText = data.descChecker;
+  document.querySelector("#opt-c1 span").innerText = data.optC1;
+  document.querySelector("#opt-c2 span").innerText = data.optC2;
+  document.querySelector("#opt-c3 span").innerText = data.optC3;
+  document.querySelector("#opt-c4 span").innerText = data.optC4;
+
+  document.getElementById("title-how").innerText = data.titleHow;
+  document.getElementById("how-h1").innerText = data.howH1;
+  document.getElementById("how-p1").innerText = data.howP1;
+  document.getElementById("how-h2").innerText = data.howH2;
+  document.getElementById("how-p2").innerText = data.howP2;
+  document.getElementById("how-h3").innerText = data.howH3;
+  document.getElementById("how-p3").innerText = data.howP3;
+
+  document.getElementById("title-wire").innerText = data.titleWire;
+  document.getElementById("desc-wire").innerText = data.descWire;
+  document.getElementById("wire-h1").innerText = data.wireH1;
+  document.getElementById("wire-p1").innerText = data.wireP1;
+  document.getElementById("wire-h2").innerText = data.wireH2;
+  document.getElementById("wire-p2").innerText = data.wireP2;
+
+  document.getElementById("title-support").innerText = data.titleSupport;
+  document.getElementById("sup-h1").innerText = data.supH1;
+  document.getElementById("sup-p1").innerText = data.supP1;
+  document.getElementById("sup-h2").innerText = data.supH2;
+  document.getElementById("sup-p2").innerText = data.supP2;
+  document.getElementById("sup-h3").innerText = data.supH3;
+  document.getElementById("sup-p3").innerText = data.supP3;
+
+  document.getElementById("title-tools").innerText = data.titleTools;
+  document.getElementById("desc-tools").innerText = data.descTools;
+  document.getElementById("tl-h1").innerText = data.tlH1;
+  document.getElementById("tl-p1").innerText = data.tlP1;
+  document.getElementById("tl-b1").innerText = data.tlB1;
+  document.getElementById("tl-h2").innerText = data.tlH2;
+  document.getElementById("tl-p2").innerText = data.tlP2;
+  document.getElementById("tl-b2").innerText = data.tlB2;
+  document.getElementById("tl-h3").innerText = data.tlH3;
+  document.getElementById("tl-p3").innerText = data.tlP3;
+  document.getElementById("tl-b3").innerText = data.tlB3;
+  
+  // إعادة معالجة فاحص الجاهزية تلقائياً لتحديث لغة النص الاستشاري المنبثق
+  runCheckReady();
+}
+
+// دالة الانتقال السلس مع تأثير الـ Blur المتطابق مع باقي الصفحات
+function toggleLang() {
+  document.body.style.setProperty('--blur-amount', '12px');
+  
+  setTimeout(() => {
+    currentLang = currentLang === "ar" ? "en" : "ar";
+    localStorage.setItem("calc_lang", currentLang);
+    applyLanguage(currentLang);
+    
+    setTimeout(() => { 
+      document.body.style.setProperty('--blur-amount', '0px'); 
+    }, 150);
+  }, 200);
+}
+
+// خوارزمية فاحص الاستعداد البرمجي الذكي متعدد اللغات
+function runCheckReady() {
+    let items = document.querySelectorAll('.check-item');
+    let score = 0;
+    items.forEach(el => { if(el.checked) score += parseInt(el.value); });
+    
+    let resultBox = document.getElementById('ready-output');
+    let scoreTxt = document.getElementById('ready-score');
+    let statusTxt = document.getElementById('ready-status');
+    
+    if(score === 0) {
+        resultBox.style.display = "none";
+        return;
+    }
+    
+    resultBox.style.display = "block";
+    scoreTxt.innerText = score + "%";
+    
+    if(score <= 25) {
+        scoreTxt.style.color = "#ff00cc";
+        statusTxt.innerText = dictionary[currentLang].status0;
+    } else if(score <= 50) {
+        scoreTxt.style.color = "#3333ff";
+        statusTxt.innerText = dictionary[currentLang].status1;
+    } else if(score <= 75) {
+        scoreTxt.style.color = "#00ffff";
+        statusTxt.innerText = dictionary[currentLang].status2;
+    } else {
+        scoreTxt.style.color = "#00ff88";
+        statusTxt.innerText = dictionary[currentLang].status3;
+    }
+}
+
+// دالة مراقبة التمرير لإظهار العناصر بسلاسة
+window.onload = function() {
+    applyLanguage(currentLang);
+
     const sections = document.querySelectorAll('.guide-section');
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
@@ -278,6 +497,7 @@
         sec.style.transition = "opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1), transform 0.6s cubic-bezier(0.25, 1, 0.5, 1)";
         observer.observe(sec);
     });
+};
 </script>
 </body>
 </html>
