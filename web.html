@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Torrema | تصميم مواقع حديثة</title>
+<title>Torrema | مهندس ومحاكي المواقع الذكي</title>
 <style>
 :root {
   --primary-gradient: linear-gradient(45deg, #ff00cc, #3333ff, #00ffff, #ff00cc);
@@ -11,7 +11,12 @@
   --card-bg: rgba(25, 25, 28, 0.7);
   --border-color: rgba(0, 255, 255, 0.2);
   --text-sec: #94a3b8;
-  --blur-amount: 0px; /* متغير التحكم في تأثير الضبابية */
+  --blur-amount: 0px;
+  
+  /* ألوان المحاكاة الديناميكية الافتراضية (نيون سايبربانك) */
+  --sim-theme: #00ffff;
+  --sim-bg: rgba(0, 255, 255, 0.05);
+  --sim-text: #00ffff;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
 
@@ -21,14 +26,12 @@ body {
   padding: 40px 5%; 
   min-height: 100vh; 
   position: relative;
-  /* إضافة الفلتر لتنفيذ الإفكت بسلاسة */
   filter: blur(var(--blur-amount));
   transition: filter 0.4s ease, background 0.5s ease, color 0.5s ease;
 }
 
-.container { max-width: 800px; margin: 0 auto; }
+.container { max-width: 1100px; margin: 0 auto; }
 
-/* زر تبديل اللغة العلوي */
 .lang-switcher-container { display: flex; justify-content: flex-end; margin-bottom: 20px; }
 .btn-lang {
   background: var(--card-bg); border: 1px solid var(--border-color); color: white;
@@ -40,68 +43,137 @@ body {
 .header { text-align: center; margin-bottom: 40px; }
 .header h1 { font-size: 35px; margin-bottom: 10px; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-size: 200%; }
 .box { background: var(--card-bg); border: 1px solid var(--border-color); padding: 30px; border-radius: 16px; margin-bottom: 25px; box-shadow: 0 0 15px rgba(0,255,255,0.05); }
-h2 { color: #00ffff; font-size: 20px; margin-bottom: 15px; }
-p { color: var(--text-sec); line-height: 1.6; font-size: 15px; }
 
-.calc-group { margin-bottom: 15px; }
-label { display: block; margin-bottom: 8px; font-weight: bold; color: #fff; }
-select, input[type="range"] { width: 100%; padding: 12px; background: #13131a; border: 1px solid var(--border-color); border-radius: 8px; color: white; font-size: 15px; outline: none; }
-.checkbox-label { display: flex; align-items: center; gap: 10px; cursor: pointer; color: var(--text-sec); margin-top: 10px; }
-.checkbox-label input { width: 18px; height: 18px; accent-color: #00ffff; flex-shrink: 0; }
-.result-box { background: rgba(0, 255, 255, 0.1); border: 1px dashed #00ffff; padding: 20px; border-radius: 8px; text-align: center; margin-top: 20px; }
-.price-tag { font-size: 28px; color: #00ffff; font-weight: bold; margin: 5px 0; }
+.builder-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 30px; margin-top: 20px; }
+@media (max-width: 900px) { .builder-grid { grid-template-columns: 1fr; } }
 
-.back-btn { display: inline-block; padding: 12px 35px; background: var(--primary-gradient); border: none; border-radius: 50px; color: white; text-decoration: none; font-weight: bold; transition: 0.3s; margin-top: 20px; }
-.back-btn:hover { transform: scale(1.05); box-shadow: 0 5px 15px rgba(0, 255, 255, 0.3); }
+.control-panel { display: flex; flex-direction: column; gap: 20px; }
+.panel-section { background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; }
+.panel-section h3 { font-size: 15px; color: #fff; margin-bottom: 12px; border-right: 3px solid var(--sim-theme); padding-right: 8px; transition: border 0.3s; }
+html[dir="ltr"] .panel-section h3 { border-right: none; border-left: 3px solid var(--sim-theme); padding-left: 8px; padding-right: 0; }
+
+.component-btn { width: 100%; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); padding: 12px 15px; border-radius: 10px; color: white; text-align: right; cursor: pointer; transition: 0.3s; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+html[dir="ltr"] .component-btn { text-align: left; }
+.component-btn:hover { border-color: var(--sim-theme); background: var(--sim-bg); transform: translateX(-3px); }
+html[dir="ltr"] .component-btn:hover { transform: translateX(3px); }
+.component-btn.active { border-color: #00ff88; background: rgba(0,255,136,0.08); }
+
+/* شريط نقاء وتغيير الألوان الحية للمحاكاة */
+.color-picker-wrapper { display: flex; align-items: center; gap: 12px; margin-bottom: 15px; background: rgba(255,255,255,0.02); padding: 12px; border-radius: 10px; border: 1px dashed var(--border-color); }
+.color-picker-wrapper span { font-size: 14px; font-weight: 600; }
+.colors-row { display: flex; gap: 10px; }
+.color-dot { width: 24px; height: 24px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: 0.2s; }
+.color-dot:hover { transform: scale(1.2); }
+.color-dot.selected { border-color: white; box-shadow: 0 0 10px white; }
+
+/* شاشة المحاكاة الحية للموقع */
+.preview-panel { background: #050507; border: 2px solid #1a1a22; border-radius: 15px; padding: 20px; display: flex; flex-direction: column; gap: 10px; min-height: 480px; position: relative; transition: border-color 0.3s; }
+.preview-browser-bar { display: flex; gap: 6px; background: #111116; padding: 8px 12px; margin: -20px -20px 10px -20px; border-top-left-radius: 13px; border-top-right-radius: 13px; border-bottom: 1px solid #1a1a22; }
+.browser-dot { width: 10px; height: 10px; border-radius: 50%; background: #333; }
+
+.preview-placeholder { text-align: center; color: var(--text-sec); font-size: 14px; position: absolute; width: 85%; left: 50%; top: 52%; transform: translate(-50%, -50%); transition: 0.3s; line-height: 1.6; }
+
+/* عناصر وبلوكات المحاكاة للموقع المنتقاة */
+.wireframe-block { background: var(--sim-bg); border: 1px solid var(--sim-theme); padding: 12px; text-align: center; border-radius: 8px; font-size: 12px; color: var(--sim-text); font-weight: bold; animation: fadeIn 0.3s ease-in-out; transition: all 0.3s; }
+
+/* صندوق لوحة التكلفة الإجمالية ومؤشر الجودة */
+.result-container { background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 16px; padding: 25px; margin-top: 30px; display: flex; flex-direction: column; gap: 15px; }
+.result-top-line { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+.price-tag { font-size: 38px; color: #00ffff; font-weight: 900; text-shadow: 0 0 15px rgba(0,255,255,0.3); transition: color 0.3s; }
+
+/* تصميم خيارات وبطاقات جودة القيمة المحدثة */
+.evaluation-badge { padding: 6px 14px; border-radius: 30px; font-size: 13px; font-weight: 700; transition: 0.3s; display: inline-block; }
+.eval-low { background: rgba(255, 0, 204, 0.1); color: #ff00cc; border: 1px solid #ff00cc; }
+.eval-medium { background: rgba(51, 51, 255, 0.1); color: #3333ff; border: 1px solid #3333ff; }
+.eval-high { background: rgba(0, 255, 136, 0.1); color: #00ff88; border: 1px solid #00ff88; }
+
+.back-btn { display: inline-block; padding: 12px 40px; background: var(--primary-gradient); border: none; border-radius: 50px; color: white; text-decoration: none; font-weight: bold; transition: 0.3s; margin-top: 25px; background-size: 200%; }
+.back-btn:hover { transform: scale(1.05); box-shadow: 0 5px 15px rgba(0, 255, 255, 0.25); }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 </head>
 <body>
 
 <div class="container">
-  <!-- منطقة تبديل اللغة -->
   <div class="lang-switcher-container">
     <button class="btn-lang" id="lang-btn" onclick="toggleLang()">🌐 EN</button>
   </div>
 
   <div class="header">
-    <h1 id="main-title">🌐 مساعد تخطيط وتصميم المواقع</h1>
-    <p id="main-desc">استخدم الأداة الذكية بالأسفل لمساعدتك في تقدير حجم كلفة ووقت مشروعك تلقائياً.</p>
+    <h1 id="main-title">🌐 مهندس ومحاكي واجهات المواقع الحية</h1>
+    <p id="main-desc">اختر مكونات نظامك، وحدد لون ثيم موقعك المفضل، وشاهد التصميم يبنى وتتحدد كفاءته حياً.</p>
   </div>
 
-  <div class="box">
-    <h2 id="calc-title">🧮 حاسبة الميزانية والوقت التقديرية</h2>
-    <p id="calc-desc" style="margin-bottom: 20px;">قم بتغيير الخيارات بناءً على ما تحتاجه في موقعك وسيقوم النظام بحساب التكلفة والزمن فوراً:</p>
+  <div class="color-picker-wrapper">
+    <span id="txt-choose-color">اختر لون هوية الموقع:</span>
+    <div class="colors-row">
+      <div class="color-dot selected" style="background: #00ffff;" onclick="changeSimulationColor('#00ffff', 'rgba(0, 255, 255, 0.05)', this)"></div>
+      <div class="color-dot" style="background: #ff00cc;" onclick="changeSimulationColor('#ff00cc', 'rgba(255, 0, 204, 0.05)', this)"></div>
+      <div class="color-dot" style="background: #3333ff;" onclick="changeSimulationColor('#3333ff', 'rgba(51, 51, 255, 0.05)', this)"></div>
+      <div class="color-dot" style="background: #00ff88;" onclick="changeSimulationColor('#00ff88', 'rgba(0, 255, 136, 0.05)', this)"></div>
+      <div class="color-dot" style="background: #ffaa00;" onclick="changeSimulationColor('#ffaa00', 'rgba(255, 170, 0, 0.05)', this)"></div>
+    </div>
+  </div>
+
+  <div class="builder-grid">
+    <div class="control-panel">
+      
+      <div class="panel-section">
+        <h3 id="sec-lbl-structure">1. الهيكل الأساسي للأقسام</h3>
+        <button class="component-btn" id="btn-hero" onclick="toggleComponent('hero', 50, 2)">
+          <span id="txt-comp-hero">🔝 واجهة هيرو ترحيبية عريضة</span>
+          <span class="comp-p-tag">$50</span>
+        </button>
+        <button class="component-btn" id="btn-about" onclick="toggleComponent('about', 30, 1)">
+          <span id="txt-comp-about">📖 شريط التعريف بالخدمات والمميزات</span>
+          <span class="comp-p-tag">$30</span>
+        </button>
+        <button class="component-btn" id="btn-gallery" onclick="toggleComponent('gallery', 60, 2)">
+          <span id="txt-comp-gallery">🖼️ معرض أعمال / خدمات تفاعلي</span>
+          <span class="comp-p-tag">$60</span>
+        </button>
+        <button class="component-btn" id="btn-contact" onclick="toggleComponent('contact', 40, 1)">
+          <span id="txt-comp-contact">✉️ صندوق مراسلة متصل بقاعدة بيانات</span>
+          <span class="comp-p-tag">$40</span>
+        </button>
+      </div>
+
+      <div class="panel-section">
+        <h3 id="sec-lbl-addons">2. إضافات الأداء الاستراتيجية</h3>
+        <button class="component-btn" id="btn-seo" onclick="toggleComponent('seo', 50, 2)">
+          <span id="txt-comp-seo">🔍 تهيئة سيو SEO متقدم للظهور بجوجل</span>
+          <span class="comp-p-tag">$50</span>
+        </button>
+        <button class="component-btn" id="btn-speed" onclick="toggleComponent('speed', 45, 1)">
+          <span id="txt-comp-speed">⚡ سيرفر سحابي فائق السرعة والأداء</span>
+          <span class="comp-p-tag">$45</span>
+        </button>
+      </div>
+
+    </div>
+
+    <div class="preview-panel" id="preview-screen">
+      <div class="preview-browser-bar">
+        <div class="browser-dot"></div><div class="browser-dot"></div><div class="browser-dot"></div>
+      </div>
+      <div class="preview-placeholder" id="placeholder-text">قم باختيار الأقسام والمميزات من القائمة الجانبية لتشاهد كيف يرتسم وينبني موقعك هنا حياً داخل المحاكي..</div>
+    </div>
+  </div>
+
+  <div class="result-container">
+    <div class="result-top-line">
+      <div>
+        <h3 id="res-label-cost" style="font-size: 16px;">الميزانية الإجمالية التقديرية لمشروعك:</h3>
+        <p id="res-label-time" style="font-size: 13px; color: var(--text-sec); margin-top: 5px;">الوقت المتوقع للتسليم والتجهيز: <span id="delivery-time" style="color:#fff; font-weight:bold;">0 يوم</span></p>
+      </div>
+      <div class="price-tag" id="total-price">$0</div>
+    </div>
     
-    <div class="calc-group">
-      <label id="label-pages">حجم الموقع المطلوبة (عدد الصفحات):</label>
-      <select id="pages" onchange="calculateProject()">
-        <option value="1" id="opt-p1">صفحة واحدة تعريفية (Landing Page)</option>
-        <option value="5" id="opt-p5">موقع تعريفي متكامل (حتى 5 صفحات)</option>
-        <option value="10" id="opt-p10">موقع كبير أو متجر خدمات (حتى 10 صفحات)</option>
-      </select>
+    <div style="border-top: 1px solid var(--border-color); padding-top: 15px;">
+      <span id="lbl-eval-status" style="font-size: 14px; color: var(--text-sec);">حالة ونطاق خطة موقعك الحالي:</span>
+      <span id="evaluation-output" class="evaluation-badge eval-low" style="margin-right: 8px;">اقتصادي / ينصح بإضافة المزيد من الخيارات</span>
     </div>
-
-    <div class="calc-group">
-      <label class="checkbox-label" id="label-seo">
-        <input type="checkbox" id="seo" onchange="calculateProject()">
-        <span>إضافة تهيئة محركات البحث التنافسية (SEO) للظهور في جوجل</span>
-      </label>
-      <label class="checkbox-label" id="label-support">
-        <input type="checkbox" id="support" onchange="calculateProject()">
-        <span>إضافة دعم فني وضمان شامل لمدة 3 أشهر مجاناً</span>
-      </label>
-    </div>
-
-    <div class="result-box">
-      <div id="text-est-cost">التكلفة التقديرية لمشروعك:</div>
-      <div class="price-tag" id="total-price">$75</div>
-      <div style="font-size: 14px; color: var(--text-sec);" id="text-delivery-wrapper">الوقت المتوقع للتسليم: <span id="delivery-time" style="color: #fff; font-weight: bold;">4 أيام</span></div>
-    </div>
-  </div>
-
-  <div class="box">
-    <h2 id="info-title">ℹ️ كيف تساعدك هذه الخدمة؟</h2>
-    <p id="info-desc">نحن لا نصمم واجهات عشوائية، بل نساعد عملك على النمو من خلال بناء موقع سريع جداً يفضله محرك البحث جوجل، مما يسهل على زبائنك الوصول إليك من أي هاتف أو جهاز كمبيوتر دون أي مشاكل تقنية.</p>
   </div>
 
   <center><a href="index.html" class="back-btn" id="back-btn">← العودة للرئيسية</a></center>
@@ -112,46 +184,73 @@ const dictionary = {
   ar: {
     dir: "rtl",
     langBtn: "🌐 EN",
-    mainTitle: "🌐 مساعد تخطيط وتصميم المواقع",
-    mainDesc: "استخدم الأداة الذكية بالأسفل لمساعدتك في تقدير حجم كلفة ووقت مشروعك تلقائياً.",
-    calcTitle: "🧮 حاسبة الميزانية والوقت التقديرية",
-    calcDesc: "قم بتغيير الخيارات بناءً على ما تحتاجه في موقعك وسيقوم النظام بحساب التكلفة والزمن فوراً:",
-    labelPages: "حجم الموقع المطلوبة (عدد الصفحات):",
-    optP1: "صفحة واحدة تعريفية (Landing Page)",
-    optP5: "موقع تعريفي متكامل (حتى 5 صفحات)",
-    optP10: "موقع كبير أو متجر خدمات (حتى 10 صفحات)",
-    labelSeo: "إضافة تهيئة محركات البحث التنافسية (SEO) للظهور في جوجل",
-    labelSupport: "إضافة دعم فني وضمان شامل لمدة 3 أشهر مجاناً",
-    textEstCost: "التكلفة التقديرية لمشروعك:",
-    textDeliveryWrapper: "الوقت المتوقع للتسليم: ",
+    mainTitle: "🌐 مهندس ومحاكي واجهات المواقع الحية",
+    mainDesc: "اختر مكونات نظامك، وحدد لون ثيم موقعك المفضل، وشاهد التصميم يبنى وتتحدد كفاءته حياً.",
+    chooseColor: "اختر لون هوية الموقع الحية:",
+    placeholderText: "قم باختيار الأقسام والمميزات من القائمة الجانبية لتشاهد كيف يرتسم وينبني موقعك هنا حياً داخل المحاكي..",
+    secStructure: "1. الهيكل الأساسي للأقسام والأزرار",
+    secAddons: "2. إضافات الأداء الاستراتيجية والقواعد",
+    compHero: "🔝 واجهة هيرو ترحيبية عريضة",
+    compAbout: "📖 شريط التعريف بالخدمات والمميزات",
+    compGallery: "🖼️ معرض أعمال / خدمات تفاعلي",
+    compContact: "✉️ صندوق مراسلة متصل بقاعدة بيانات",
+    compSeo: "🔍 تهيئة سيو SEO متقدم للظهور بجوجل",
+    compSpeed: "⚡ سيرفر سحابي فائق السرعة والأداء",
+    resLabelCost: "الميزانية الإجمالية التقديرية لمشروعك:",
+    resLabelTime: "الوقت المتوقع للتسليم والتجهيز: ",
     daysSuffix: " أيام",
-    infoTitle: "ℹ️ كيف تساعدك هذه الخدمة؟",
-    infoDesc: "نحن لا نصمم واجهات عشوائية، بل نساعد عملك على النمو من خلال بناء موقع سريع جداً يفضله محرك البحث جوجل، مما يسهل على زبائنك الوصول إليك من أي هاتف أو جهاز كمبيوتر دون أي مشاكل تقنية.",
-    backBtn: "← العودة للرئيسية"
+    lblEvalStatus: "حالة ونطاق خطة موقعك الحالي:",
+    backBtn: "← العودة للرئيسية",
+    
+    // نصوص مجسمات المحاكاة للـ Wireframe
+    wfHero: "[ واجهة ترحيبية هيرو نيون مخصصة ]",
+    wfAbout: "[ صندوق استعراض المزايا والتعريف بالنشاط ]",
+    wfGallery: "[ شبكة عرض محتوى البورتفوليو والأعمال التفاعلية ]",
+    wfContact: "[ استمارة اتصال متكاملة مؤمنة ضد الاختراق ]",
+    wfSeo: "[ طبقة شيفرات الكود لتهيئة محركات بحث جوجل ]",
+    wfSpeed: "[ ربط السيرفر السحابي لتقليل زمن الاستجابة ]",
+
+    // خيارات تقييم القيمة الذكية
+    evalLow: "اقتصادي / ينصح بتوسيع خطة أقسام موقعك",
+    evalMedium: "جيد جداً ومتكامل / يغطي الاحتياجات التشغيلية الأساسية لعملك",
+    evalHigh: "احترافي وخارق / منصة جاهزة للمنافسة في السوق بأعلى سرعة وأرشفة"
   },
   en: {
     dir: "ltr",
     langBtn: "🌐 AR",
-    mainTitle: "🌐 Web Design & Planning Assistant",
-    mainDesc: "Use the smart tool below to automatically estimate the cost and timeline of your project.",
-    calcTitle: "🧮 Estimated Budget & Time Calculator",
-    calcDesc: "Modify the options based on your requirements, and the system will instantly calculate the cost and timeline:",
-    labelPages: "Required Website Size (Number of Pages):",
-    optP1: "Single Landing Page Package",
-    optP5: "Complete Corporate Site (Up to 5 Pages)",
-    optP10: "Large Site or E-Commerce Store (Up to 10 Pages)",
-    labelSeo: "Add competitive Search Engine Optimization (SEO) to rank on Google",
-    labelSupport: "Add dedicated support & full warranty for 3 months free",
-    textEstCost: "Estimated cost for your project:",
-    textDeliveryWrapper: "Expected delivery time: ",
+    mainTitle: "🌐 Live UX Architecture & Simulator",
+    mainDesc: "Choose system components, specify your color aesthetic theme, and view structure configurations update live.",
+    chooseColor: "Select Active Site Identity Accent:",
+    placeholderText: "Select blocks and performance modifiers from side controls to map out the application environment layout here dynamically..",
+    secStructure: "1. Structural Views & Section Blocks",
+    secAddons: "2. Strategic Performance Modifiers",
+    compHero: "🔝 Modern Dynamic Header View (Hero)",
+    compAbout: "📖 Core Operational Profiles & Features",
+    compGallery: "🖼️ Grid Interactive Showcase Layout",
+    compContact: "✉️ Endpoint Messaging Box & DB Layer",
+    compSeo: "🔍 Advanced Google Search Index SEO Optimization",
+    compSpeed: "⚡ Cloud Infrastructure Edge Routing Engine",
+    resLabelCost: "Total Estimated Workspace Budget:",
+    resLabelTime: "Expected Development Sequence: ",
     daysSuffix: " Days",
-    infoTitle: "ℹ️ How does this service help you?",
-    infoDesc: "We don't just design random interfaces; we help your business scale by building lightning-fast websites favored by Google's search algorithms, making it effortless for customers to reach you via mobile or desktop seamlessly.",
-    backBtn: "Back to Home →"
+    lblEvalStatus: "Current Architectural Target Plan Tier:",
+    backBtn: "Back to Home →",
+    
+    wfHero: "[ Neon Identity Immersive Hero View ]",
+    wfAbout: "[ Extended Functional Features Descriptor ]",
+    wfGallery: "[ Fully Adaptive Grid Asset Portfolio Showcase ]",
+    wfContact: "[ Secure Contact Form Router & Encrypted Database ]",
+    wfSeo: "[ Structural Search Metadata Target Layer ]",
+    wfSpeed: "[ Blazing Speed CDN Distributed Edge Nodes Connected ]",
+
+    evalLow: "Budget / Recommended to select more expansion modules",
+    evalMedium: "Very Good & Solid / Covers essential business targets flawlessly",
+    evalHigh: "Ultimate Enterprise Spec / Ready for heavy competition at maximum speeds"
   }
 };
 
 let currentLang = localStorage.getItem("calc_lang") || "ar";
+let selectedComponents = {};
 
 function applyLanguage(lang) {
   const data = dictionary[lang];
@@ -161,60 +260,114 @@ function applyLanguage(lang) {
   document.getElementById("lang-btn").innerText = data.langBtn;
   document.getElementById("main-title").innerText = data.mainTitle;
   document.getElementById("main-desc").innerText = data.mainDesc;
-  document.getElementById("calc-title").innerText = data.calcTitle;
-  document.getElementById("calc-desc").innerText = data.calcDesc;
-  document.getElementById("label-pages").innerText = data.labelPages;
-  document.getElementById("opt-p1").innerText = data.optP1;
-  document.getElementById("opt-p5").innerText = data.optP5;
-  document.getElementById("opt-p10").innerText = data.optP10;
-  document.querySelector("#label-seo span").innerText = data.labelSeo;
-  document.querySelector("#label-support span").innerText = data.labelSupport;
-  document.getElementById("text-est-cost").innerText = data.textEstCost;
-  document.getElementById("info-title").innerText = data.infoTitle;
-  document.getElementById("info-desc").innerText = data.infoDesc;
+  document.getElementById("txt-choose-color").innerText = data.chooseColor;
+  document.getElementById("placeholder-text").innerText = data.placeholderText;
+  
+  document.getElementById("sec-lbl-structure").innerText = data.secStructure;
+  document.getElementById("sec-lbl-addons").innerText = data.secAddons;
+  
+  document.getElementById("txt-comp-hero").innerText = data.compHero;
+  document.getElementById("txt-comp-about").innerText = data.compAbout;
+  document.getElementById("txt-comp-gallery").innerText = data.compGallery;
+  document.getElementById("txt-comp-contact").innerText = data.compContact;
+  document.getElementById("txt-comp-seo").innerText = data.compSeo;
+  document.getElementById("txt-comp-speed").innerText = data.compSpeed;
+  
+  document.getElementById("res-label-cost").innerText = data.resLabelCost;
+  document.getElementById("lbl-eval-status").innerText = data.lblEvalStatus;
   document.getElementById("back-btn").innerText = data.backBtn;
   
-  calculateProject();
+  renderWireframe();
 }
 
-// دالة التبديل مع إضافة تأثير الأنيميشن والـ Blur المتوافق مع الـ index
 function toggleLang() {
-  // 1. تفعيل الضبابية العالية فوراً
   document.body.style.setProperty('--blur-amount', '12px');
-  
   setTimeout(() => {
-    // 2. تغيير اللغة والاتجاه أثناء اختفاء النصوص خلف الضبابية
     currentLang = currentLang === "ar" ? "en" : "ar";
     localStorage.setItem("calc_lang", currentLang);
     applyLanguage(currentLang);
-    
-    // 3. إعادة إيضاح الشاشة بالتدريج لإنهاء الإفكت البصري
-    setTimeout(() => { 
-      document.body.style.setProperty('--blur-amount', '0px'); 
-    }, 150);
-  }, 200); // وقت انتظار الذروة لقلب المحتوى
+    setTimeout(() => { document.body.style.setProperty('--blur-amount', '0px'); }, 150);
+  }, 200);
 }
 
-function calculateProject() {
-  let pages = parseInt(document.getElementById('pages').value);
-  let hasSEO = document.getElementById('seo').checked;
-  let hasSupport = document.getElementById('support').checked;
+// دالة تغيير اللون الحية لتعديل ثيم المحاكاة بالكامل فوراً
+function changeSimulationColor(colorCode, rgbaCode, element) {
+  document.querySelectorAll('.color-dot').forEach(dot => dot.classList.remove('selected'));
+  element.classList.add('selected');
   
-  let basePrice = 0;
-  let days = 0;
+  document.documentElement.style.setProperty('--sim-theme', colorCode);
+  document.documentElement.style.setProperty('--sim-bg', rgbaCode);
+  document.documentElement.style.setProperty('--sim-text', colorCode);
+}
 
-  if(pages === 1) { basePrice = 75; days = 4; }
-  else if(pages === 5) { basePrice = 200; days = 9; }
-  else if(pages === 10) { basePrice = 420; days = 16; }
+function toggleComponent(id, price, days) {
+  const btn = document.getElementById(`btn-${id}`);
+  if (selectedComponents[id]) {
+    delete selectedComponents[id];
+    btn.classList.remove('active');
+  } else {
+    selectedComponents[id] = { price, days };
+    btn.classList.add('active');
+  }
+  renderWireframe();
+}
 
-  if(hasSEO) { basePrice += 131; days += 2; }
-  if(hasSupport) { basePrice += 100; }
-
-  document.getElementById('total-price').innerText = "$" + basePrice;
+function renderWireframe() {
+  const previewScreen = document.getElementById('preview-screen');
+  const placeholder = document.getElementById('placeholder-text');
   
-  const wrapperText = dictionary[currentLang].textDeliveryWrapper;
+  document.querySelectorAll('.wireframe-block').forEach(el => el.remove());
+  
+  let totalPrice = 0;
+  let totalDays = 0;
+  let hasAny = false;
+  
+  const componentOrder = ['hero', 'about', 'gallery', 'contact', 'seo', 'speed'];
+  
+  componentOrder.forEach(id => {
+    if (selectedComponents[id]) {
+      hasAny = true;
+      totalPrice += selectedComponents[id].price;
+      totalDays += selectedComponents[id].days;
+      
+      const block = document.createElement('div');
+      block.className = 'wireframe-block';
+      
+      if(id === 'hero') block.innerText = dictionary[currentLang].wfHero;
+      if(id === 'about') block.innerText = dictionary[currentLang].wfAbout;
+      if(id === 'gallery') block.innerText = dictionary[currentLang].wfGallery;
+      if(id === 'contact') block.innerText = dictionary[currentLang].wfContact;
+      if(id === 'seo') block.innerText = dictionary[currentLang].wfSeo;
+      if(id === 'speed') block.innerText = dictionary[currentLang].wfSpeed;
+      
+      previewScreen.appendChild(block);
+    }
+  });
+  
+  placeholder.style.display = hasAny ? 'none' : 'block';
+  document.getElementById('total-price').innerText = "$" + totalPrice;
+  
+  const timeLabel = dictionary[currentLang].resLabelTime;
   const suffix = dictionary[currentLang].daysSuffix;
-  document.getElementById('text-delivery-wrapper').innerHTML = wrapperText + `<span id="delivery-time" style="color: #fff; font-weight: bold;">${days}${suffix}</span>`;
+  document.getElementById('res-label-time').innerHTML = timeLabel + `<span id="delivery-time" style="color:#fff; font-weight:bold;">${totalDays}${suffix}</span>`;
+  
+  // تفعيل نظام تقييم جودة القيمة المصاحب الذكي (الرخيص / المتوسط / الغالي المحترف)
+  const evalOutput = document.getElementById('evaluation-output');
+  evalOutput.className = "evaluation-badge"; // تصفير الكلاسات
+  
+  if (totalPrice === 0) {
+    evalOutput.innerText = "...";
+    evalOutput.classList.add('eval-low');
+  } else if (totalPrice <= 100) {
+    evalOutput.innerText = dictionary[currentLang].evalLow;
+    evalOutput.classList.add('eval-low');
+  } else if (totalPrice <= 200) {
+    evalOutput.innerText = dictionary[currentLang].evalMedium;
+    evalOutput.classList.add('eval-medium');
+  } else {
+    evalOutput.innerText = dictionary[currentLang].evalHigh;
+    evalOutput.classList.add('eval-high');
+  }
 }
 
 window.onload = function() {
