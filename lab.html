@@ -1,378 +1,470 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Torrema | مهندس ومحاكي المواقع الذكي</title>
-<style>
-:root {
-  --primary-gradient: linear-gradient(45deg, #ff00cc, #3333ff, #00ffff, #ff00cc);
-  --bg-dark: #0a0a0c;
-  --card-bg: rgba(25, 25, 28, 0.7);
-  --border-color: rgba(0, 255, 255, 0.2);
-  --text-sec: #94a3b8;
-  --blur-amount: 0px;
-  
-  /* ألوان المحاكاة الديناميكية الافتراضية (نيون سايبربانك) */
-  --sim-theme: #00ffff;
-  --sim-bg: rgba(0, 255, 255, 0.05);
-  --sim-text: #00ffff;
-}
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+<html lang="en" dir="ltr" id="app-root"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TORREMA | Next-Gen Workspace</title>
+    <style>
+        :root {
+            --bg-base: #040508;
+            --bg-surface: #0a0d14;
+            --bg-input: #0f131f;
+            --neon-green: #00ffaa;
+            --neon-blue: #00e5ff;
+            --glow-green: rgba(0, 255, 170, 0.25);
+            --glow-blue: rgba(0, 229, 255, 0.25);
+            --text-main: #e2e8f0;
+            --text-muted: #64748b;
+            --border-glow: rgba(0, 229, 255, 0.15);
+        }
 
-body { 
-  background: var(--bg-dark); 
-  color: white; 
-  padding: 40px 5%; 
-  min-height: 100vh; 
-  position: relative;
-  filter: blur(var(--blur-amount));
-  transition: filter 0.4s ease, background 0.5s ease, color 0.5s ease;
-}
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
 
-.container { max-width: 1100px; margin: 0 auto; }
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
 
-.lang-switcher-container { display: flex; justify-content: flex-end; margin-bottom: 20px; }
-.btn-lang {
-  background: var(--card-bg); border: 1px solid var(--border-color); color: white;
-  padding: 8px 16px; border-radius: 30px; cursor: pointer; font-size: 14px; font-weight: 600;
-  transition: 0.3s;
-}
-.btn-lang:hover { border-color: #ff00cc; box-shadow: 0 0 10px rgba(255,0,204,0.3); transform: scale(1.05); }
+        /* --- شاشة الانتظار السريعة النيونية --- */
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #020305; 
+            z-index: 9999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(0, 255, 170, 0.05);
+            border-top-color: var(--neon-green);
+            border-right-color: var(--neon-blue);
+            border-radius: 50%;
+            animation: spin 0.4s linear infinite; 
+            box-shadow: 0 0 15px var(--glow-blue);
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-.header { text-align: center; margin-bottom: 40px; }
-.header h1 { font-size: 35px; margin-bottom: 10px; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-size: 200%; }
-.box { background: var(--card-bg); border: 1px solid var(--border-color); padding: 30px; border-radius: 16px; margin-bottom: 25px; box-shadow: 0 0 15px rgba(0,255,255,0.05); }
+        /* نظام الصفحات */
+        .page-structure {
+            display: none;
+            height: 100vh;
+        }
+        .page-structure.active-page {
+            display: flex;
+            flex-direction: column;
+        }
 
-.builder-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 30px; margin-top: 20px; }
-@media (max-width: 900px) { .builder-grid { grid-template-columns: 1fr; } }
+        /* --- Navbar --- */
+        .navbar {
+            background-color: var(--bg-surface);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 24px;
+            border-bottom: 2px solid var(--neon-blue);
+            box-shadow: 0 2px 20px var(--glow-blue);
+            height: 60px;
+            z-index: 100;
+        }
+        .nav-logo { font-weight: 800; font-size: 18px; letter-spacing: 1px; color: #fff; text-shadow: 0 0 10px var(--glow-blue); }
+        .nav-logo span { color: var(--neon-green); font-weight: 600; font-size: 13px; text-shadow: 0 0 8px var(--glow-green); }
+        .nav-links { display: flex; gap: 24px; font-size: 13px; font-weight: 700; color: var(--text-main); }
+        .nav-links span { text-shadow: 0 0 5px rgba(255,255,255,0.1); }
+        .nav-right { display: flex; align-items: center; gap: 12px; }
 
-.control-panel { display: flex; flex-direction: column; gap: 20px; }
-.panel-section { background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; }
-.panel-section h3 { font-size: 15px; color: #fff; margin-bottom: 12px; border-right: 3px solid var(--sim-theme); padding-right: 8px; transition: border 0.3s; }
-html[dir="ltr"] .panel-section h3 { border-right: none; border-left: 3px solid var(--sim-theme); padding-left: 8px; padding-right: 0; }
+        /* الأزرار النيونية المحسنة */
+        .btn-neon-action {
+            background: transparent;
+            color: var(--neon-green);
+            border: 1px solid var(--neon-green);
+            padding: 8px 18px;
+            border-radius: 6px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            box-shadow: 0 0 10px var(--glow-green);
+        }
+        .btn-neon-action:hover {
+            color: #000;
+            background: var(--neon-green);
+            box-shadow: 0 0 20px var(--neon-green);
+        }
+        
+        .btn-blue-neon {
+            color: var(--neon-blue);
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 10px var(--glow-blue);
+        }
+        .btn-blue-neon:hover {
+            color: #000;
+            background: var(--neon-blue);
+            box-shadow: 0 0 20px var(--neon-blue);
+        }
 
-.component-btn { width: 100%; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); padding: 12px 15px; border-radius: 10px; color: white; text-align: right; cursor: pointer; transition: 0.3s; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-html[dir="ltr"] .component-btn { text-align: left; }
-.component-btn:hover { border-color: var(--sim-theme); background: var(--sim-bg); transform: translateX(-3px); }
-html[dir="ltr"] .component-btn:hover { transform: translateX(3px); }
-.component-btn.active { border-color: #00ff88; background: rgba(0,255,136,0.08); }
+        .btn-reset-action { color: #ff4a4a; border-color: #ff4a4a; box-shadow: none; }
+        .btn-reset-action:hover { background: #ff4a4a; box-shadow: 0 0 15px rgba(255, 74, 74, 0.5); }
 
-/* شريط نقاء وتغيير الألوان الحية للمحاكاة */
-.color-picker-wrapper { display: flex; align-items: center; gap: 12px; margin-bottom: 15px; background: rgba(255,255,255,0.02); padding: 12px; border-radius: 10px; border: 1px dashed var(--border-color); }
-.color-picker-wrapper span { font-size: 14px; font-weight: 600; }
-.colors-row { display: flex; gap: 10px; }
-.color-dot { width: 24px; height: 24px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: 0.2s; }
-.color-dot:hover { transform: scale(1.2); }
-.color-dot.selected { border-color: white; box-shadow: 0 0 10px white; }
+        .btn-lang-switcher {
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--neon-blue);
+            border: 1px solid var(--neon-blue);
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 12px;
+        }
 
-/* شاشة المحاكاة الحية للموقع */
-.preview-panel { background: #050507; border: 2px solid #1a1a22; border-radius: 15px; padding: 20px; display: flex; flex-direction: column; gap: 10px; min-height: 480px; position: relative; transition: border-color 0.3s; }
-.preview-browser-bar { display: flex; gap: 6px; background: #111116; padding: 8px 12px; margin: -20px -20px 10px -20px; border-top-left-radius: 13px; border-top-right-radius: 13px; border-bottom: 1px solid #1a1a22; }
-.browser-dot { width: 10px; height: 10px; border-radius: 50%; background: #333; }
+        /* --- Workspace Layout --- */
+        .workspace-grid {
+            display: flex;
+            flex-direction: column; 
+            flex: 1;
+            height: calc(100vh - 60px - 25px);
+            overflow: hidden;
+        }
 
-.preview-placeholder { text-align: center; color: var(--text-sec); font-size: 14px; position: absolute; width: 85%; left: 50%; top: 52%; transform: translate(-50%, -50%); transition: 0.3s; line-height: 1.6; }
+        /* منطقة المحررات العلوية الكبيرة */
+        .editors-top-panel {
+            display: flex;
+            flex: 1; 
+            min-height: 50%; 
+            background-color: var(--bg-base);
+            border-bottom: 2px solid var(--neon-green);
+            box-shadow: 0 4px 15px var(--glow-green);
+        }
 
-/* عناصر وبلوكات المحاكاة للموقع المنتقاة */
-.wireframe-block { background: var(--sim-bg); border: 1px solid var(--sim-theme); padding: 12px; text-align: center; border-radius: 8px; font-size: 12px; color: var(--sim-text); font-weight: bold; animation: fadeIn 0.3s ease-in-out; transition: all 0.3s; }
+        .code-container-box {
+            flex: 1; 
+            background-color: var(--bg-surface);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border-right: 1px solid var(--border-glow);
+        }
+        .code-container-box:last-child { border-right: none; }
 
-/* صندوق لوحة التكلفة الإجمالية ومؤشر الجودة */
-.result-container { background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 16px; padding: 25px; margin-top: 30px; display: flex; flex-direction: column; gap: 15px; }
-.result-top-line { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
-.price-tag { font-size: 38px; color: #00ffff; font-weight: 900; text-shadow: 0 0 15px rgba(0,255,255,0.3); transition: color 0.3s; }
+        html[dir="rtl"] .code-container-box {
+            border-right: none;
+            border-left: 1px solid var(--border-glow);
+        }
+        html[dir="rtl"] .code-container-box:last-child { border-left: none; }
 
-/* تصميم خيارات وبطاقات جودة القيمة المحدثة */
-.evaluation-badge { padding: 6px 14px; border-radius: 30px; font-size: 13px; font-weight: 700; transition: 0.3s; display: inline-block; }
-.eval-low { background: rgba(255, 0, 204, 0.1); color: #ff00cc; border: 1px solid #ff00cc; }
-.eval-medium { background: rgba(51, 51, 255, 0.1); color: #3333ff; border: 1px solid #3333ff; }
-.eval-high { background: rgba(0, 255, 136, 0.1); color: #00ff88; border: 1px solid #00ff88; }
+        .box-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 14px;
+            background: rgba(0, 0, 0, 0.4);
+            font-size: 12px;
+            font-weight: 700;
+            color: #fff;
+            border-bottom: 1px solid var(--border-glow);
+        }
+        
+        .box-header .html-title-lbl { color: var(--neon-blue); text-shadow: 0 0 5px var(--glow-blue); }
+        .box-header .css-title-lbl { color: var(--neon-green); text-shadow: 0 0 5px var(--glow-green); }
+        .box-header .js-title-lbl { color: #ffd700; }
 
-.back-btn { display: inline-block; padding: 12px 40px; background: var(--primary-gradient); border: none; border-radius: 50px; color: white; text-decoration: none; font-weight: bold; transition: 0.3s; margin-top: 25px; background-size: 200%; }
-.back-btn:hover { transform: scale(1.05); box-shadow: 0 5px 15px rgba(0, 255, 255, 0.25); }
+        .lang-badge {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-muted);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+        }
 
-@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-</style>
+        .editor-workspace {
+            display: flex;
+            flex: 1;
+            padding: 10px 0;
+            background-color: var(--bg-input);
+            overflow: hidden;
+        }
+        
+        .line-counter {
+            width: 40px; 
+            color: var(--text-muted);
+            font-family: 'Courier New', monospace; 
+            font-size: 13px; 
+            line-height: 1.6; 
+            user-select: none;
+            text-align: center;
+            border-right: 1px solid rgba(255, 255, 255, 0.02);
+        }
+        
+        .textarea-input {
+            flex: 1; 
+            background: transparent; 
+            border: none; 
+            color: #fff;
+            font-family: 'Fira Code', 'Courier New', Courier, monospace; 
+            font-size: 14px; 
+            resize: none; 
+            outline: none; 
+            line-height: 1.6; 
+            overflow-y: auto; 
+            white-space: pre;
+            padding-left: 12px;
+            padding-right: 12px;
+            direction: ltr;
+            text-align: left;
+        }
+
+        /* منطقة المعاينة السفلية */
+        .live-preview-pane {
+            flex: 1; 
+            background: #ffffff; 
+            height: 100%;
+        }
+        #preview-frame-output { 
+            width: 100%; 
+            height: 100%; 
+            border: none; 
+            background: #ffffff; 
+        }
+
+        .bottom-status-bar {
+            height: 25px; background: #020305; border-top: 1px solid var(--border-glow);
+            display: flex; align-items: center; padding: 0 24px; font-size: 11px; color: var(--neon-green);
+            text-shadow: 0 0 5px var(--glow-green);
+        }
+
+        /* --- واجهة الترحيب التفاعلية العميقة (index.html) --- */
+        .modern-hub-view {
+            background: radial-gradient(circle at center, #0f1424 0%, #030407 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100vw;
+        }
+        .hub-glass-card {
+            background: rgba(10, 13, 20, 0.8);
+            border: 2px solid var(--neon-blue);
+            box-shadow: 0 0 30px var(--glow-blue);
+            padding: 50px 40px;
+            border-radius: 16px;
+            max-width: 600px;
+            width: 100%;
+            backdrop-filter: blur(20px);
+            text-align: center;
+        }
+        .hub-glass-card h1 {
+            font-size: 34px; margin-bottom: 12px; font-weight: 800;
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-green));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .hub-glass-card p { color: #94a3b8; margin-bottom: 28px; font-size: 15px; }
+        .hub-actions { display: flex; gap: 12px; justify-content: center; }
+    </style>
 </head>
 <body>
 
-<div class="container">
-  <div class="lang-switcher-container">
-    <button class="btn-lang" id="lang-btn" onclick="toggleLang()">🌐 EN</button>
-  </div>
-
-  <div class="header">
-    <h1 id="main-title">🌐 مهندس ومحاكي واجهات المواقع الحية</h1>
-    <p id="main-desc">اختر مكونات نظامك، وحدد لون ثيم موقعك المفضل، وشاهد التصميم يبنى وتتحدد كفاءته حياً.</p>
-  </div>
-
-  <div class="color-picker-wrapper">
-    <span id="txt-choose-color">اختر لون هوية الموقع:</span>
-    <div class="colors-row">
-      <div class="color-dot selected" style="background: #00ffff;" onclick="changeSimulationColor('#00ffff', 'rgba(0, 255, 255, 0.05)', this)"></div>
-      <div class="color-dot" style="background: #ff00cc;" onclick="changeSimulationColor('#ff00cc', 'rgba(255, 0, 204, 0.05)', this)"></div>
-      <div class="color-dot" style="background: #3333ff;" onclick="changeSimulationColor('#3333ff', 'rgba(51, 51, 255, 0.05)', this)"></div>
-      <div class="color-dot" style="background: #00ff88;" onclick="changeSimulationColor('#00ff88', 'rgba(0, 255, 136, 0.05)', this)"></div>
-      <div class="color-dot" style="background: #ffaa00;" onclick="changeSimulationColor('#ffaa00', 'rgba(255, 170, 0, 0.05)', this)"></div>
-    </div>
-  </div>
-
-  <div class="builder-grid">
-    <div class="control-panel">
-      
-      <div class="panel-section">
-        <h3 id="sec-lbl-structure">1. الهيكل الأساسي للأقسام</h3>
-        <button class="component-btn" id="btn-hero" onclick="toggleComponent('hero', 50, 2)">
-          <span id="txt-comp-hero">🔝 واجهة هيرو ترحيبية عريضة</span>
-          <span class="comp-p-tag">$50</span>
-        </button>
-        <button class="component-btn" id="btn-about" onclick="toggleComponent('about', 30, 1)">
-          <span id="txt-comp-about">📖 شريط التعريف بالخدمات والمميزات</span>
-          <span class="comp-p-tag">$30</span>
-        </button>
-        <button class="component-btn" id="btn-gallery" onclick="toggleComponent('gallery', 60, 2)">
-          <span id="txt-comp-gallery">🖼️ معرض أعمال / خدمات تفاعلي</span>
-          <span class="comp-p-tag">$60</span>
-        </button>
-        <button class="component-btn" id="btn-contact" onclick="toggleComponent('contact', 40, 1)">
-          <span id="txt-comp-contact">✉️ صندوق مراسلة متصل بقاعدة بيانات</span>
-          <span class="comp-p-tag">$40</span>
-        </button>
-      </div>
-
-      <div class="panel-section">
-        <h3 id="sec-lbl-addons">2. إضافات الأداء الاستراتيجية</h3>
-        <button class="component-btn" id="btn-seo" onclick="toggleComponent('seo', 50, 2)">
-          <span id="txt-comp-seo">🔍 تهيئة سيو SEO متقدم للظهور بجوجل</span>
-          <span class="comp-p-tag">$50</span>
-        </button>
-        <button class="component-btn" id="btn-speed" onclick="toggleComponent('speed', 45, 1)">
-          <span id="txt-comp-speed">⚡ سيرفر سحابي فائق السرعة والأداء</span>
-          <span class="comp-p-tag">$45</span>
-        </button>
-      </div>
-
+    <!-- شاشة الانتظار السريعة النيونية -->
+    <div id="loading-screen">
+        <div class="spinner"></div>
+        <span style="color: #fff; font-size: 13px; font-weight: 600; text-shadow: 0 0 8px var(--glow-blue);" id="loading-text">Loading...</span>
     </div>
 
-    <div class="preview-panel" id="preview-screen">
-      <div class="preview-browser-bar">
-        <div class="browser-dot"></div><div class="browser-dot"></div><div class="browser-dot"></div>
-      </div>
-      <div class="preview-placeholder" id="placeholder-text">قم باختيار الأقسام والمميزات من القائمة الجانبية لتشاهد كيف يرتسم وينبني موقعك هنا حياً داخل المحاكي..</div>
+    <!-- واجهة المحرر التفاعلي (النشط افتراضياً) -->
+    <div id="editor-screen-id" class="page-structure active-page">
+        <div class="navbar">
+            <div class="nav-logo">TORREMA <span id="nav-subtitle-text">| Interactive Workspace</span></div>
+            <div class="nav-links">
+                <span>&lt;HTML5/&gt;</span>
+                <span id="tab-text-id">Workspace Live</span>
+                <span>[CSS3 Architecture]</span>
+            </div>
+            <div class="nav-right">
+                <button class="btn-lang-switcher" id="lang-btn" onclick="switchSystemLanguageWithDelay()">Language: EN</button>
+                <button class="btn-neon-action btn-reset-action" id="reset-btn-1" onclick="quickReset()">Reset</button>
+                
+                <!-- الرابط المحدث للعودة للصفحة الرئيسية -->
+                <a href="index.html" class="btn-neon-action btn-blue-neon">العودة للصفحة الرئيسية</a>
+            </div>
+        </div>
+
+        <div class="workspace-grid" id="main-workspace-grid">
+            <div class="editors-top-panel">
+                <!-- HTML Box -->
+                <div class="code-container-box">
+                    <div class="box-header"><span class="html-title-lbl">HTML Structure</span><span class="lang-badge">Live View</span></div>
+                    <div class="editor-workspace">
+                        <div class="line-counter" id="html-line-box">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br></div>
+                        <textarea id="html-code-area" class="textarea-input" oninput="processEditorInput('html')"></textarea>
+                    </div>
+                </div>
+
+                <!-- CSS Box -->
+                <div class="code-container-box">
+                    <div class="box-header"><span class="css-title-lbl">Neon CSS</span><span class="lang-badge">Style Core</span></div>
+                    <div class="editor-workspace">
+                        <div class="line-counter" id="css-line-box">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>10<br>11<br>12<br>13<br>14<br>15<br>16<br>17<br>18<br>19<br>20<br>21<br>22<br>23<br>24<br>25<br>26<br>27<br>28<br></div>
+                        <textarea id="css-code-area" class="textarea-input" oninput="processEditorInput('css')"></textarea>
+                    </div>
+                </div>
+
+                <!-- JS Box -->
+                <div class="code-container-box">
+                    <div class="box-header"><span class="js-title-lbl">JavaScript</span><span class="lang-badge">Script Engine</span></div>
+                    <div class="editor-workspace">
+                        <div class="line-counter" id="js-line-box">1<br></div>
+                        <textarea id="js-code-area" class="textarea-input" oninput="processEditorInput('js')"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- لوحة المعاينة السفلية الكبيرة -->
+            <div class="live-preview-pane">
+                <iframe id="preview-frame-output"></iframe>
+            </div>
+        </div>
+
+        <div class="bottom-status-bar" id="validation-msg-bar">✓ System Status: Active and secure.</div>
     </div>
-  </div>
 
-  <div class="result-container">
-    <div class="result-top-line">
-      <div>
-        <h3 id="res-label-cost" style="font-size: 16px;">الميزانية الإجمالية التقديرية لمشروعك:</h3>
-        <p id="res-label-time" style="font-size: 13px; color: var(--text-sec); margin-top: 5px;">الوقت المتوقع للتسليم والتجهيز: <span id="delivery-time" style="color:#fff; font-weight:bold;">0 يوم</span></p>
-      </div>
-      <div class="price-tag" id="total-price">$0</div>
-    </div>
-    
-    <div style="border-top: 1px solid var(--border-color); padding-top: 15px;">
-      <span id="lbl-eval-status" style="font-size: 14px; color: var(--text-sec);">حالة ونطاق خطة موقعك الحالي:</span>
-      <span id="evaluation-output" class="evaluation-badge eval-low" style="margin-right: 8px;">اقتصادي / ينصح بإضافة المزيد من الخيارات</span>
-    </div>
-  </div>
+    <!-- بقية السكربت كما هو -->
+    <script>
+        const defaultHTML = `<div class="welcome-block">\n    <h1 id="live-main-title">TORREMA Workspace</h1>\n    <p id="live-main-desc">Neon development environment successfully activated.</p>\n    <div class="neon-glow-card">\n        <h3 id="live-card-title">Realtime Sandboxing</h3>\n        <p id="live-card-desc">Modify the code fields above to watch instant UI injection below.</p>\n    </div>\n</div>`;
+        const defaultCSS = `body {\n    padding: 40px;\n    background-color: #05070c;\n    color: #f1f5f9;\n    font-family: system-ui, sans-serif;\n    display: flex;\n    justify-content: center;\n}\n.welcome-block {\n    max-width: 500px;\n    width: 100%;\n}\n#live-main-title {\n    color: #00e5ff;\n    margin-bottom: 8px;\n}\n#live-main-desc {\n    color: #64748b;\n    font-size: 14px;\n}\n.neon-glow-card {\n    background: rgba(255,255,255,0.01);\n    border: 1px solid #00ffaa;\n    box-shadow: 0 0 15px rgba(0,255,170,0.2);\n    padding: 20px;\n    border-radius: 10px;\n    margin-top: 25px;\n}`;
+        const defaultJS = `console.log("Workspace pipeline initiated dynamically.");`;
 
-  <center><a href="index.html" class="back-btn" id="back-btn">← العودة للرئيسية</a></center>
-</div>
+        let currentAppLanguage = 'en';
 
-<script>
-const dictionary = {
-  ar: {
-    dir: "rtl",
-    langBtn: "🌐 EN",
-    mainTitle: "🌐 مهندس ومحاكي واجهات المواقع الحية",
-    mainDesc: "اختر مكونات نظامك، وحدد لون ثيم موقعك المفضل، وشاهد التصميم يبنى وتتحدد كفاءته حياً.",
-    chooseColor: "اختر لون هوية الموقع الحية:",
-    placeholderText: "قم باختيار الأقسام والمميزات من القائمة الجانبية لتشاهد كيف يرتسم وينبني موقعك هنا حياً داخل المحاكي..",
-    secStructure: "1. الهيكل الأساسي للأقسام والأزرار",
-    secAddons: "2. إضافات الأداء الاستراتيجية والقواعد",
-    compHero: "🔝 واجهة هيرو ترحيبية عريضة",
-    compAbout: "📖 شريط التعريف بالخدمات والمميزات",
-    compGallery: "🖼️ معرض أعمال / خدمات تفاعلي",
-    compContact: "✉️ صندوق مراسلة متصل بقاعدة بيانات",
-    compSeo: "🔍 تهيئة سيو SEO متقدم للظهور بجوجل",
-    compSpeed: "⚡ سيرفر سحابي فائق السرعة والأداء",
-    resLabelCost: "الميزانية الإجمالية التقديرية لمشروعك:",
-    resLabelTime: "الوقت المتوقع للتسليم والتجهيز: ",
-    daysSuffix: " أيام",
-    lblEvalStatus: "حالة ونطاق خطة موقعك الحالي:",
-    backBtn: "← العودة للرئيسية",
-    
-    // نصوص مجسمات المحاكاة للـ Wireframe
-    wfHero: "[ واجهة ترحيبية هيرو نيون مخصصة ]",
-    wfAbout: "[ صندوق استعراض المزايا والتعريف بالنشاط ]",
-    wfGallery: "[ شبكة عرض محتوى البورتفوليو والأعمال التفاعلية ]",
-    wfContact: "[ استمارة اتصال متكاملة مؤمنة ضد الاختراق ]",
-    wfSeo: "[ طبقة شيفرات الكود لتهيئة محركات بحث جوجل ]",
-    wfSpeed: "[ ربط السيرفر السحابي لتقليل زمن الاستجابة ]",
+        const uiDictionary = {
+            en: {
+                dir: 'ltr',
+                loadingText: 'Loading File Matrix...',
+                changingLangText: 'Switching Language Node...',
+                resettingText: 'Purging and Resetting Node...',
+                navSubtitle: '| Interactive Workspace',
+                tabText: 'Workspace Live',
+                langBtn: 'Language: EN',
+                resetBtn: 'Reset',
+                statusBar: '✓ System Status: Active and secure.'
+            },
+            ar: {
+                dir: 'rtl',
+                loadingText: 'جاري تحميل مصفوفة الملفات...',
+                changingLangText: 'جاري تبديل لغة الخادم...',
+                resettingText: 'جاري تنظيف وإعادة تهيئة بيئة العمل...',
+                navSubtitle: '| مساحة العمل التفاعلية',
+                tabText: 'منصة البث المباشر',
+                langBtn: 'اللغة: AR',
+                resetBtn: 'إعادة تعيين',
+                statusBar: '✓ حالة النظام: نشط وآمن تماماً.'
+            }
+        };
 
-    // خيارات تقييم القيمة الذكية
-    evalLow: "اقتصادي / ينصح بتوسيع خطة أقسام موقعك",
-    evalMedium: "جيد جداً ومتكامل / يغطي الاحتياجات التشغيلية الأساسية لعملك",
-    evalHigh: "احترافي وخارق / منصة جاهزة للمنافسة في السوق بأعلى سرعة وأرشفة"
-  },
-  en: {
-    dir: "ltr",
-    langBtn: "🌐 AR",
-    mainTitle: "🌐 Live UX Architecture & Simulator",
-    mainDesc: "Choose system components, specify your color aesthetic theme, and view structure configurations update live.",
-    chooseColor: "Select Active Site Identity Accent:",
-    placeholderText: "Select blocks and performance modifiers from side controls to map out the application environment layout here dynamically..",
-    secStructure: "1. Structural Views & Section Blocks",
-    secAddons: "2. Strategic Performance Modifiers",
-    compHero: "🔝 Modern Dynamic Header View (Hero)",
-    compAbout: "📖 Core Operational Profiles & Features",
-    compGallery: "🖼️ Grid Interactive Showcase Layout",
-    compContact: "✉️ Endpoint Messaging Box & DB Layer",
-    compSeo: "🔍 Advanced Google Search Index SEO Optimization",
-    compSpeed: "⚡ Cloud Infrastructure Edge Routing Engine",
-    resLabelCost: "Total Estimated Workspace Budget:",
-    resLabelTime: "Expected Development Sequence: ",
-    daysSuffix: " Days",
-    lblEvalStatus: "Current Architectural Target Plan Tier:",
-    backBtn: "Back to Home →",
-    
-    wfHero: "[ Neon Identity Immersive Hero View ]",
-    wfAbout: "[ Extended Functional Features Descriptor ]",
-    wfGallery: "[ Fully Adaptive Grid Asset Portfolio Showcase ]",
-    wfContact: "[ Secure Contact Form Router & Encrypted Database ]",
-    wfSeo: "[ Structural Search Metadata Target Layer ]",
-    wfSpeed: "[ Blazing Speed CDN Distributed Edge Nodes Connected ]",
+        function applySystemTranslation(lang) {
+            const data = uiDictionary[lang];
+            const rootNode = document.getElementById('app-root');
+            rootNode.setAttribute('dir', data.dir);
+            rootNode.setAttribute('lang', lang);
+            document.getElementById('nav-subtitle-text').innerText = data.navSubtitle;
+            document.getElementById('tab-text-id').innerText = data.tabText;
+            document.getElementById('lang-btn').innerText = data.langBtn;
+            document.getElementById('reset-btn-1').innerText = data.resetBtn;
+            document.getElementById('validation-msg-bar').innerText = data.statusBar;
+        }
 
-    evalLow: "Budget / Recommended to select more expansion modules",
-    evalMedium: "Very Good & Solid / Covers essential business targets flawlessly",
-    evalHigh: "Ultimate Enterprise Spec / Ready for heavy competition at maximum speeds"
-  }
-};
+        function quickReset() {
+            showLoading(uiDictionary[currentAppLanguage].resettingText);
+            setTimeout(() => {
+                document.getElementById('html-code-area').value = defaultHTML;
+                document.getElementById('css-code-area').value = defaultCSS;
+                document.getElementById('js-code-area').value = defaultJS;
+                recalculateLines('html');
+                recalculateLines('css');
+                recalculateLines('js');
+                compileAndRunPreview();
+                hideLoading();
+            }, 500); 
+        }
 
-let currentLang = localStorage.getItem("calc_lang") || "ar";
-let selectedComponents = {};
+        function showLoading(text) {
+            const loader = document.getElementById('loading-screen');
+            document.getElementById('loading-text').innerText = text;
+            loader.style.display = 'flex';
+        }
+        
+        function hideLoading() {
+            document.getElementById('loading-screen').style.display = 'none';
+        }
 
-function applyLanguage(lang) {
-  const data = dictionary[lang];
-  document.documentElement.setAttribute("dir", data.dir);
-  document.documentElement.setAttribute("lang", lang);
-  
-  document.getElementById("lang-btn").innerText = data.langBtn;
-  document.getElementById("main-title").innerText = data.mainTitle;
-  document.getElementById("main-desc").innerText = data.mainDesc;
-  document.getElementById("txt-choose-color").innerText = data.chooseColor;
-  document.getElementById("placeholder-text").innerText = data.placeholderText;
-  
-  document.getElementById("sec-lbl-structure").innerText = data.secStructure;
-  document.getElementById("sec-lbl-addons").innerText = data.secAddons;
-  
-  document.getElementById("txt-comp-hero").innerText = data.compHero;
-  document.getElementById("txt-comp-about").innerText = data.compAbout;
-  document.getElementById("txt-comp-gallery").innerText = data.compGallery;
-  document.getElementById("txt-comp-contact").innerText = data.compContact;
-  document.getElementById("txt-comp-seo").innerText = data.compSeo;
-  document.getElementById("txt-comp-speed").innerText = data.compSpeed;
-  
-  document.getElementById("res-label-cost").innerText = data.resLabelCost;
-  document.getElementById("lbl-eval-status").innerText = data.lblEvalStatus;
-  document.getElementById("back-btn").innerText = data.backBtn;
-  
-  renderWireframe();
-}
+        function switchSystemLanguageWithDelay() {
+            showLoading(uiDictionary[currentAppLanguage].changingLangText);
+            setTimeout(() => {
+                currentAppLanguage = currentAppLanguage === 'en' ? 'ar' : 'en';
+                applySystemTranslation(currentAppLanguage);
+                hideLoading();
+            }, 400);
+        }
 
-function toggleLang() {
-  document.body.style.setProperty('--blur-amount', '12px');
-  setTimeout(() => {
-    currentLang = currentLang === "ar" ? "en" : "ar";
-    localStorage.setItem("calc_lang", currentLang);
-    applyLanguage(currentLang);
-    setTimeout(() => { document.body.style.setProperty('--blur-amount', '0px'); }, 150);
-  }, 200);
-}
+        function recalculateLines(editorType) {
+            const area = document.getElementById(`${editorType}-code-area`);
+            const container = document.getElementById(`${editorType}-line-box`);
+            const count = area.value.split('\n').length;
+            let htmlOutput = '';
+            for (let idx = 1; idx <= count; idx++) { htmlOutput += idx + '<br>'; }
+            container.innerHTML = htmlOutput;
+        }
 
-// دالة تغيير اللون الحية لتعديل ثيم المحاكاة بالكامل فوراً
-function changeSimulationColor(colorCode, rgbaCode, element) {
-  document.querySelectorAll('.color-dot').forEach(dot => dot.classList.remove('selected'));
-  element.classList.add('selected');
-  
-  document.documentElement.style.setProperty('--sim-theme', colorCode);
-  document.documentElement.style.setProperty('--sim-bg', rgbaCode);
-  document.documentElement.style.setProperty('--sim-text', colorCode);
-}
+        function processEditorInput(editorType) {
+            recalculateLines(editorType);
+            compileAndRunPreview();
+        }
 
-function toggleComponent(id, price, days) {
-  const btn = document.getElementById(`btn-${id}`);
-  if (selectedComponents[id]) {
-    delete selectedComponents[id];
-    btn.classList.remove('active');
-  } else {
-    selectedComponents[id] = { price, days };
-    btn.classList.add('active');
-  }
-  renderWireframe();
-}
+        function compileAndRunPreview() {
+            const htmlVal = document.getElementById('html-code-area').value;
+            const cssVal = document.getElementById('css-code-area').value;
+            const jsVal = document.getElementById('js-code-area').value;
+            const frame = document.getElementById('preview-frame-output');
 
-function renderWireframe() {
-  const previewScreen = document.getElementById('preview-screen');
-  const placeholder = document.getElementById('placeholder-text');
-  
-  document.querySelectorAll('.wireframe-block').forEach(el => el.remove());
-  
-  let totalPrice = 0;
-  let totalDays = 0;
-  let hasAny = false;
-  
-  const componentOrder = ['hero', 'about', 'gallery', 'contact', 'seo', 'speed'];
-  
-  componentOrder.forEach(id => {
-    if (selectedComponents[id]) {
-      hasAny = true;
-      totalPrice += selectedComponents[id].price;
-      totalDays += selectedComponents[id].days;
-      
-      const block = document.createElement('div');
-      block.className = 'wireframe-block';
-      
-      if(id === 'hero') block.innerText = dictionary[currentLang].wfHero;
-      if(id === 'about') block.innerText = dictionary[currentLang].wfAbout;
-      if(id === 'gallery') block.innerText = dictionary[currentLang].wfGallery;
-      if(id === 'contact') block.innerText = dictionary[currentLang].wfContact;
-      if(id === 'seo') block.innerText = dictionary[currentLang].wfSeo;
-      if(id === 'speed') block.innerText = dictionary[currentLang].wfSpeed;
-      
-      previewScreen.appendChild(block);
-    }
-  });
-  
-  placeholder.style.display = hasAny ? 'none' : 'block';
-  document.getElementById('total-price').innerText = "$" + totalPrice;
-  
-  const timeLabel = dictionary[currentLang].resLabelTime;
-  const suffix = dictionary[currentLang].daysSuffix;
-  document.getElementById('res-label-time').innerHTML = timeLabel + `<span id="delivery-time" style="color:#fff; font-weight:bold;">${totalDays}${suffix}</span>`;
-  
-  // تفعيل نظام تقييم جودة القيمة المصاحب الذكي (الرخيص / المتوسط / الغالي المحترف)
-  const evalOutput = document.getElementById('evaluation-output');
-  evalOutput.className = "evaluation-badge"; // تصفير الكلاسات
-  
-  if (totalPrice === 0) {
-    evalOutput.innerText = "...";
-    evalOutput.classList.add('eval-low');
-  } else if (totalPrice <= 100) {
-    evalOutput.innerText = dictionary[currentLang].evalLow;
-    evalOutput.classList.add('eval-low');
-  } else if (totalPrice <= 200) {
-    evalOutput.innerText = dictionary[currentLang].evalMedium;
-    evalOutput.classList.add('eval-medium');
-  } else {
-    evalOutput.innerText = dictionary[currentLang].evalHigh;
-    evalOutput.classList.add('eval-high');
-  }
-}
+            const executionBundle = `
+                <!DOCTYPE html>
+                <html>
+                <head><style>${cssVal}</style></head>
+                <body>
+                    ${htmlVal}
+                    <script>${jsVal}<\/script>
+                </body>
+                </html>
+            `;
+            const frameDoc = frame.contentDocument || frame.contentWindow.document;
+            frameDoc.open();
+            frameDoc.write(executionBundle);
+            frameDoc.close();
+        }
 
-window.onload = function() {
-  applyLanguage(currentLang);
-};
-</script>
-</body>
-</html>
+        window.onload = function() {
+            document.getElementById('html-code-area').value = defaultHTML;
+            document.getElementById('css-code-area').value = defaultCSS;
+            document.getElementById('js-code-area').value = defaultJS;
+            recalculateLines('html');
+            recalculateLines('css');
+            recalculateLines('js');
+            applySystemTranslation(currentAppLanguage);
+            compileAndRunPreview();
+        };
+    </script>
+
+</body></html>
