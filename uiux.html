@@ -3,141 +3,229 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Torrema | تجربة المستخدم UI/UX</title>
+<title>TORREMA | UX Engineering & Data Flow</title>
 <style>
+/* تم تحديث لوحة الألوان بناءً على الألوان الجديدة: رمادي داكن، أخضر نيون، وأزرق نيون */
 :root {
-  --primary-gradient: linear-gradient(45deg, #ff00cc, #3333ff, #00ffff, #ff00cc);
+  /* التدرج النيوني الجديد لأكواد تجربة المستخدم */
+  --primary-gradient: linear-gradient(45deg, #00ff88, #00ffff, #3333ff, #00ff88);
+  /* ألوان الخلفية الرمادية والداكنة */
   --bg-dark: #0a0a0c;
+  /* البطاقات بالرمادي الداكن */
   --card-bg: rgba(25, 25, 28, 0.7);
+  /* الحدود الزرقاء النيونية */
   --border-color: rgba(51, 51, 255, 0.2);
+  /* ألوان التمييز (النيون) */
+  --cyan-neon: #00ffff;
+  --green-neon: #00ff88;
+  --blue-neon: #3333ff;
+  /* ألوان النصوص */
+  --text-main: #f0f0f0;
   --text-sec: #94a3b8;
-  --blur-amount: 0px; /* التحكم في تأثير الضبابية */
+  
+  --blur-amount: 0px; 
 }
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
 
 body { 
   background: var(--bg-dark); 
-  color: white; 
+  color: var(--text-main); 
   padding: 40px 5%; 
   min-height: 100vh; 
   position: relative;
-  /* تطبيق تأثير الـ Blur على الصفحة بالكامل */
+  /* تطبيق تأثير الضبابية العام في حال تبديل اللغة */
   filter: blur(var(--blur-amount));
-  transition: filter 0.4s ease, background 0.5s ease, color 0.5s ease;
+  transition: filter 0.4s ease, background 0.5s ease;
 }
 
-.container { max-width: 800px; margin: 0 auto; }
+.container { max-width: 1000px; margin: 0 auto; }
 
-/* زر تبديل اللغة العلوي */
-.lang-switcher-container { display: flex; justify-content: flex-end; margin-bottom: 20px; }
-.btn-lang {
-  background: var(--card-bg); border: 1px solid var(--border-color); color: white;
-  padding: 8px 16px; border-radius: 30px; cursor: pointer; font-size: 14px; font-weight: 600;
-  transition: 0.3s;
+/* شريط التحكم العلوي */
+.top-controls { position: fixed; top: 30px; left: 8%; right: 8%; display: flex; justify-content: space-between; z-index: 1000; pointer-events: none; }
+.back-home, .lang-btn { 
+  padding: 10px 24px; background: rgba(20, 20, 22, 0.8); border: 1px solid var(--border-color); color: #fff; text-decoration: none; border-radius: 30px; font-weight: 600; font-size: 13px; backdrop-filter: blur(10px); transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.5); pointer-events: auto; cursor: pointer; display: flex; align-items: center; gap: 6px; 
 }
-.btn-lang:hover { border-color: #ff00cc; box-shadow: 0 0 10px rgba(255,0,204,0.3); transform: scale(1.05); }
+.back-home:hover, .lang-btn:hover { border-color: var(--pink-neon); box-shadow: 0 0 15px rgba(255,0,204,0.3); transform: translateY(-2px); }
 
-.header { text-align: center; margin-bottom: 40px; }
-.header h1 { font-size: 35px; margin-bottom: 10px; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-size: 200%; }
-.box { background: var(--card-bg); border: 1px solid var(--border-color); padding: 30px; border-radius: 16px; margin-bottom: 25px; }
-h2 { color: #3333ff; font-size: 20px; margin-bottom: 15px; }
-p { color: var(--text-sec); line-height: 1.6; font-size: 15px; }
+.header { text-align: center; margin-bottom: 60px; padding-top: 50px;}
+.header h1 { font-size: 38px; margin-bottom: 10px; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-size: 200%; }
+.header p { color: var(--text-sec); }
 
-.comparison-container { display: flex; gap: 20px; margin-top: 20px; flex-wrap: wrap; }
-.compare-card { flex: 1; min-width: 280px; background: #111116; border: 1px solid rgba(255,255,255,0.05); padding: 20px; border-radius: 12px; text-align: center; }
-.bad-ui { border-top: 4px solid #ef4444; }
-.good-ui { border-top: 4px solid #22c55e; }
-.mock-btn { display: inline-block; padding: 10px 20px; margin-top: 15px; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-.bad-btn { background: #333; color: #666; font-size: 11px; text-decoration: line-through; }
-.good-btn { background: var(--primary-gradient); color: white; box-shadow: 0 4px 10px rgba(0,255,255,0.2); }
-.explain-text { font-size: 13px; margin-top: 10px; display: block; }
+/* قسم البطاقات الرئيسية */
+.ui-comparison { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-bottom: 50px; }
+.compare-card { 
+  background: var(--card-bg); border: 1px solid var(--border-color); padding: 30px; border-radius: 20px; backdrop-filter: blur(10px); transition: 0.3s ease; position: relative;
+}
+.compare-card:hover { transform: translateY(-5px); border-color: rgba(0, 255, 255, 0.3); box-shadow: 0 0 20px rgba(0,255,255,0.1); }
 
-.back-btn { display: inline-block; padding: 12px 35px; background: var(--primary-gradient); border: none; border-radius: 50px; color: white; text-decoration: none; font-weight: bold; transition: 0.3s; margin-top: 20px; }
-.back-btn:hover { transform: scale(1.05); box-shadow: 0 5px 15px rgba(51, 51, 255, 0.3); }
+/* الأنماط المحددة للـ Good UI (النيونية الخضراء) */
+.good-ui-card { border-top: 4px solid var(--green-neon); box-shadow: 0 0 15px rgba(0, 255, 136, 0.05); }
+.good-ui-card h3 { color: var(--green-neon); font-size: 22px; margin-bottom: 15px; }
+
+/* الأنماط المحددة للـ Bad UI (النيونية الزرقاء/السيان) */
+.bad-ui-card { border-top: 4px solid var(--cyan-neon); box-shadow: 0 0 15px rgba(0, 255, 255, 0.05); }
+.bad-ui-card h3 { color: var(--cyan-neon); font-size: 22px; margin-bottom: 15px; }
+
+/* أنماط النقاط داخل البطاقات */
+.points-list { list-style: none; padding-right: 20px; margin-bottom: 25px; }
+.points-list li { color: var(--text-sec); margin-bottom: 10px; font-size: 14px; position: relative; }
+.points-list li::before { content: '✦'; color: var(--pink-neon); position: absolute; right: -20px; }
+.bad-ui-card .points-list li::before { color: var(--cyan-neon); }
+
+/* قسم رحلة المستخدم التفاعلية Behavioral Journey */
+.behavior-journey { background: var(--card-bg); border: 1px solid var(--border-color); padding: 30px; border-radius: 20px; margin-bottom: 40px; position: relative; overflow: hidden; backdrop-filter: blur(10px); }
+.behavior-journey h2 { color: white; font-size: 24px; margin-bottom: 20px; text-align: center;}
+.behavior-journey p { text-align: center; color: var(--text-sec); margin-bottom: 30px;}
+
+/* شبكة محاكاة رحلة المستخدم (The loop) كما في الصورة */
+.journey-sim { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; position: relative; }
+
+/* الـ Flowchart للبيانات - محاكاة تفاعلية */
+.data-flow-viz { grid-column: 1 / -1; background: #000; border: 1px dashed var(--border-color); border-radius: 12px; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 150px; margin-top: 20px; position: relative;}
+.data-node { width: 30px; height: 30px; border-radius: 50%; background: var(--card-bg); border: 2px solid var(--cyan-neon); display: flex; justify-content: center; align-items: center; color: white; font-weight: bold; font-size: 12px; position: absolute; transition: 0.3s; z-index: 10;}
+.data-line { position: absolute; background: linear-gradient(to right, var(--cyan-neon), var(--green-neon)); height: 2px; z-index: 5;}
+
+/* بطاقات رحلة المستخدم الصغيرة */
+.flow-card { background: rgba(10, 10, 15, 0.5); border: 1px solid rgba(255,255,255,0.03); padding: 20px; border-radius: 12px; text-align: center; }
+.flow-card .icon { font-size: 32px; margin-bottom: 15px; }
+.flow-card h4 { font-size: 16px; color: white; margin-bottom: 8px; }
+.flow-card p { font-size: 13px; color: var(--text-sec); }
+
+/* بطاقات التفاصيل المنبثقة */
+.info-pop { flex: 1; border-top: 2px solid; padding: 20px; border-radius: 12px; margin-top: 20px; background: rgba(10, 10, 15, 0.5); font-size: 13px; color: var(--text-sec); text-align: left;}
+
 </style>
 </head>
 <body>
 
+<div class="top-controls">
+  <a href="index.html" class="back-home" id="back-home">← العودة للرئيسية</a>
+  <button class="lang-btn" id="lang-btn" onclick="toggleLang()">🌐 EN</button>
+</div>
+
 <div class="container">
-  <!-- منطقة تبديل اللغة -->
-  <div class="lang-switcher-container">
-    <button class="btn-lang" id="lang-btn" onclick="toggleLang()">🌐 EN</button>
-  </div>
-
   <div class="header">
-    <h1 id="main-title">✨ هندسة واجهات المبيعات وتجربة المستخدم</h1>
-    <p id="main-desc">أداة بصرية حية لمساعدتك في فهم كيف يؤثر التصميم والترتيب الهندسي على زيادة مبيعاتك أو خسارتها.</p>
+    <h1 id="main-title">✨ هندسة مخرجات البيانات وتجربة المستخدم</h1>
+    <p id="main-desc">محاكاة حية لعلم دراسة هندسة تجربة المستخدم وبناء رحلة العميل نحو اتخاذ القرار.</p>
   </div>
 
-  <div class="box">
-    <h2 id="compare-title">👀 شاهد التغيير: تصميم عادي وعشوائي VS تصميم مدروس ومقنع</h2>
-    <p id="compare-desc">قارن بنفسك بين التخطيطين لتدرك لماذا يهرب الزبائن من بعض المواقع وينجذبون لمواقع أخرى مريحة بصرياً:</p>
-    
-    <div class="comparison-container">
-      <div class="compare-card bad-ui">
-        <h3 style="color:#ef4444; margin-bottom: 8px;" id="bad-title">❌ التصميم العشوائي (السيئ)</h3>
-        <p style="font-size: 13px;" id="bad-desc">نصوص طويلة جداً متداخلة، ألوان عشوائية ومؤذية للعين، وزر الشراء غير واضح وصغير جداً في زاوية ميتة.</p>
-        <span class="mock-btn bad-btn" id="bad-btn-text">اضغط هنا للاشتراك بالخدمة من موقعنا الآن</span>
-        <small class="explain-text" style="color: #ef4444;" id="bad-result">النتيجة: العميل يضيع ويغلق الصفحة فوراً.</small>
+  <div class="ui-comparison">
+    <!-- Good UI Card (كما في الصورة) -->
+    <div class="compare-card good-ui-card">
+      <h3 id="good-title">✅ Good UI engineering</h3>
+      <p style="font-size: 14px; color: white; margin-bottom: 10px;" id="good-header">مخرجات مريحة نفسياً ومقنعة للعميل.</p>
+      <ul class="points-list" id="good-points">
+        <li>بناء رحلة العميل المهندسة للقرار Behavioral Journey.</li>
+        <li>محاكاة تدفق سريع للبيانات Rapid Stream Trails.</li>
+        <li>دعم أولوي Priority Support.</li>
+        <li>هندسة نظام التشغيل الكامل OS Architecture.</li>
+        <li>واجهة مخصصة لكل مستخدم Custom UI.</li>
+      </ul>
+      <p style="font-size: 12px;" id="good-footer">النتيجة: تفاعل فوري وزيادة هائلة في المبيعات!</p>
+    </div>
+
+    <!-- Bad UI Card (كما في الصورة) -->
+    <div class="compare-card bad-ui-card">
+      <h3 id="bad-title">❌ Bad UI Engineering</h3>
+      <p style="font-size: 14px; color: white; margin-bottom: 10px;" id="bad-header">واجهات سيئة، عشوائية، ومشتتة لقرار العميل.</p>
+      <ul class="points-list" id="bad-points">
+        <li>تصميم عشوائي وغير مدروس.</li>
+        <li>نصوص متداخلة ومزعجة للعين.</li>
+        <li>زر اتخاذ قرار (CTA) ضعيف ومخفي.</li>
+        <li>مخرجات بيانات غير واضحة ومشتتة.</li>
+      </ul>
+      <p style="font-size: 12px;" id="bad-footer">النتيجة: العميل يضيع ويغلق الصفحة فوراً.</p>
+    </div>
+  </div>
+
+  <!-- Behavioral Journey (التفاعل المباشر كما في الصورة) -->
+  <div class="behavior-journey" id="behavior-center">
+    <h2 id="journey-title">⚙️ Behavioral Data Journey Center</h2>
+    <p id="journey-desc">محاكاة عملية لكيفية هندسة رحلة المستخدم المهندسة للقرار (The engineered Behavioral loop) كما في الصورة.</p>
+
+    <div class="journey-sim">
+      <!-- محاكاة تدفق البيانات -->
+      <div class="data-flow-viz">
+        <div class="data-node" style="left: 10%; top: 30%;">1</div>
+        <div class="data-node" style="left: 25%; top: 60%;">2</div>
+        <div class="data-node" style="left: 45%; top: 20%;">3</div>
+        <div class="data-node" style="left: 65%; top: 70%;">4</div>
+        <div class="data-node" style="left: 85%; top: 35%;">✅</div>
+        <div class="data-line" style="left: 13%; top: 38%; width: 10%; transform: rotate(15deg);"></div>
+        <div class="data-line" style="left: 28%; top: 65%; width: 15%; transform: rotate(-12deg);"></div>
+        <div class="data-line" style="left: 48%; top: 25%; width: 15%; transform: rotate(20deg);"></div>
+        <div class="data-line" style="left: 68%; top: 73%; width: 15%; transform: rotate(-25deg);"></div>
       </div>
-      
-      <div class="compare-card good-ui">
-        <h3 style="color:#22c55e; margin-bottom: 8px;" id="good-title">✅ تصميم Torrema (الممتاز)</h3>
-        <p style="font-size: 13px;" id="good-desc">ألوان مريحة نفسياً ومدروسة، نقاط واضحة ومباشرة تلخص الفائدة، وزر شراء واضح يجذب عين الزائر ليتخذ قراراً سريعاً.</p>
-        <span class="mock-btn good-btn" id="good-btn-text">احصل على العرض الآن 🚀</span>
-        <small class="explain-text" style="color: #22c55e;" id="good-result">النتيجة: زيادة في نسبة المبيعات وتفاعل فوري!</small>
+
+      <!-- بطاقات رحلة المستخدم Behavioral loop -->
+      <div class="flow-card">
+        <div class="icon">📊</div>
+        <h4 id="point1-title">Heatmap Analysis</h4>
+        <p id="point1-desc">نقوم بتحليل الخرائط الحرارية لمعرفة أين ينظر العميل أولاً (عادةً في الزاوية العلوية اليمنى).</p>
+      </div>
+      <div class="flow-card">
+        <div class="icon">🔍</div>
+        <h4 id="point2-title">F-Shape Reading</h4>
+        <p id="point2-desc">نقوم بتصميم رحلة المستخدم على شكل حرف 'F' لضمان قراءة النقاط الأكثر أهمية.</p>
+      </div>
+      <div class="flow-card">
+        <div class="icon">🛑</div>
+        <h4 id="point3-title">Identify Friction</h4>
+        <p id="point3-desc">تحديد وحذف أي نقاط مشتتة لقرار العميل (Decision Friction).</p>
       </div>
     </div>
   </div>
 
-  <div class="box">
-    <h2 id="info-title">ℹ️ كيف نساعدك في دراسة سلوك العميل؟</h2>
-    <p id="info-desc">نقوم برسم وبناء رحلة العميل خطوة بخطوة من لحظة دخوله للموقع وحتى إتمام الدفع، بحيث نوجه نظره بذكاء وبطرق نفسية مدروسة نحو المنتجات أو الخدمات التي ترغب ببيعها بكثافة.</p>
-  </div>
-
-  <center><a href="index.html" class="back-btn" id="back-btn">← العودة للرئيسية</a></center>
 </div>
 
 <script>
-// قاموس الكلمات والترجمات للغتين
+// قاموس الترجمة للغتين (كما في الصورة)
 const dictionary = {
   ar: {
     dir: "rtl",
     langBtn: "🌐 EN",
-    mainTitle: "✨ هندسة واجهات المبيعات وتجربة المستخدم",
-    mainDesc: "أداة بصرية حية لمساعدتك في فهم كيف يؤثر التصميم والترتيب الهندسي على زيادة مبيعاتك أو خسارتها.",
-    compareTitle: "👀 شاهد التغيير: تصميم عادي وعشوائي VS تصميم مدروس ومقنع",
-    compareDesc: "قارن بنفسك بين التخطيطين لتدرك لماذا يهرب الزبائن من بعض المواقع وينجذبون لمواقع أخرى مريحة بصرياً:",
-    badTitle: "❌ التصميم العشوائي (السيئ)",
-    badDesc: "نصوص طويلة جداً متداخلة، ألوان عشوائية ومؤذية للعين، وزر الشراء غير واضح وصغير جداً في زاوية ميتة.",
-    badBtnText: "اضغط هنا للاشتراك بالخدمة من موقعنا الآن",
-    badResult: "النتيجة: العميل يضيع ويغلق الصفحة فوراً.",
-    goodTitle: "✅ تصميم Torrema (الممتاز)",
-    goodDesc: "ألوان مريحة نفسياً ومدروسة، نقاط واضحة ومباشرة تلخص الفائدة، وزر شراء واضح يجذب عين الزائر ليتخذ قراراً سريعاً.",
-    goodBtnText: "احصل على العرض الآن 🚀",
-    goodResult: "النتيجة: زيادة في نسبة المبيعات وتفاعل فوري!",
-    infoTitle: "ℹ️ كيف نساعدك في دراسة سلوك العميل؟",
-    infoDesc: "نقوم برسم وبناء رحلة العميل خطوة بخطوة من لحظة دخوله للموقع وحتى إتمام الدفع، بحيث نوجه نظره بذكاء وبطرق نفسية مدروسة نحو المنتجات أو الخدمات التي ترغب ببيعها بكثافة.",
-    backBtn: "← العودة للرئيسية"
+    backHome: "← العودة للرئيسية",
+    mainTitle: "✨ هندسة مخرجات البيانات وتجربة المستخدم",
+    mainDesc: "محاكاة حية لعلم دراسة هندسة تجربة المستخدم وبناء رحلة العميل نحو اتخاذ القرار.",
+    goodTitle: "✅ Good UI Engineering",
+    goodHeader: "مخرجات مريحة نفسياً ومقنعة للعميل.",
+    badTitle: "❌ Bad UI Engineering",
+    badHeader: "واجهات سيئة، عشوائية، ومشتتة لقرار العميل.",
+    goodPoints: ["بناء رحلة العميل المهندسة للقرار Behavioral Journey.", "محاكاة تدفق سريع للبيانات Rapid Stream Trails.", "دعم أولوي Priority Support.", "هندسة نظام التشغيل الكامل OS Architecture.", "واجهة مخصصة لكل مستخدم Custom UI."],
+    badPoints: ["تصميم عشوائي وغير مدروس.", "نصوص متداخلة ومزعجة للعين.", "زر اتخاذ قرار (CTA) ضعيف ومخفي.", "مخرجات بيانات غير واضحة ومشتتة."],
+    goodFooter: "النتيجة: تفاعل فوري وزيادة هائلة في المبيعات!",
+    badFooter: "النتيجة: العميل يضيع ويغلق الصفحة فوراً.",
+    journeyTitle: "⚙️ Behavioral Data Journey Center",
+    journeyDesc: "محاكاة عملية لكيفية هندسة رحلة المستخدم المهندسة للقرار (The engineered Behavioral loop) كما في الصورة.",
+    point1Title: "Heatmap Analysis",
+    point1Desc: "نقوم بتحليل الخرائط الحرارية لمعرفة أين ينظر العميل أولاً (عادةً في الزاوية العلوية اليمنى).",
+    point2Title: "F-Shape Reading",
+    point2Desc: "نقوم بتصميم رحلة المستخدم على شكل حرف 'F' لضمان قراءة النقاط الأكثر أهمية.",
+    point3Title: "Identify Friction",
+    point3Desc: "تحديد وحذف أي نقاط مشتتة لقرار العميل (Decision Friction)."
   },
   en: {
     dir: "ltr",
     langBtn: "🌐 AR",
-    mainTitle: "✨ Sales UI/UX & Conversion Engineering",
-    mainDesc: "A live visual tool to help you understand how intentional design and spatial layouts impact your sales conversion or loss.",
-    compareTitle: "👀 Witness the Change: Generic Layout VS Strategic Design",
-    compareDesc: "Compare both frameworks to understand why users bounce from unoptimized websites while converting heavily on structured platforms:",
-    badTitle: "❌ Unstructured Layout (Poor UX)",
-    badDesc: "Overwhelming blocks of text, exhausting color harmony, and a microscopic call-to-action buried in a dead-zone layout.",
-    badBtnText: "Click here to subscribe to our services via this web link now",
-    badResult: "Outcome: Total customer friction. User leaves instantly.",
-    goodTitle: "✅ Torrema Standard (Premium UX)",
-    goodDesc: "High-end aesthetic contrasts, scannable value hooks, and an optimized, high-converting CTA that guides user decision-making.",
-    goodBtnText: "Claim Your Offer Now 🚀",
-    goodResult: "Outcome: Immediate user engagement and spiking sales!",
-    infoTitle: "ℹ️ How do we engineer your customer's journey?",
-    infoDesc: "We map out and program your visitor's behavioral loop from initial hit to checkout, scientifically guiding their eye level towards your primary, high-ticket services effortlessly.",
-    backBtn: "Back to Home →"
+    backHome: "Back to Home →",
+    mainTitle: "✨ Data Flow & UX Engineering",
+    mainDesc: "A live simulation of UX architecture and building the decision-making customer journey.",
+    goodTitle: "✅ Good UI engineering",
+    goodHeader: "Psychologically comfortable and persuasive output.",
+    badTitle: "❌ Bad UI Engineering",
+    badHeader: "Poor, randomized, and distracting UI interfaces.",
+    goodPoints: ["Building the engineered decision Behavioral Journey.", "Simulation of Rapid Stream Trails.", "Priority Support.", "OS Architecture engineering.", "Custom UI per user."],
+    badPoints: ["Randomized and non-strategic design.", "Overlapping and exhausting text.", "Microscopic and hidden Call-to-Action.", "Unclear and distracting data outputs."],
+    goodFooter: "Outcome: Instant interaction and spikes in sales!",
+    badFooter: "Outcome: Total customer friction. User leaves instantly.",
+    journeyTitle: "⚙️ Behavioral Data Journey Center",
+    journeyDesc: "Practical simulation of engineering the decision-making customer loop as seen in the image.",
+    point1Title: "Heatmap Analysis",
+    point1Desc: "Analyzing Heatmaps to know where the customer looks first (usually the top right corner).",
+    point2Title: "F-Shape Reading",
+    point2Desc: "Designing the UX journey on an 'F-Shape' pattern to ensure key points are read.",
+    point3Title: "Identify Friction",
+    point3Desc: "Identifying and removing any distracting elements (Decision Friction)."
   }
 };
 
@@ -153,21 +241,37 @@ function applyLanguage(lang) {
   
   // استبدال النصوص
   document.getElementById("lang-btn").innerText = data.langBtn;
+  document.getElementById("back-home").innerText = data.backHome;
   document.getElementById("main-title").innerText = data.mainTitle;
   document.getElementById("main-desc").innerText = data.mainDesc;
-  document.getElementById("compare-title").innerText = data.compareTitle;
-  document.getElementById("compare-desc").innerText = data.compareDesc;
-  document.getElementById("bad-title").innerText = data.badTitle;
-  document.getElementById("bad-desc").innerText = data.badDesc;
-  document.getElementById("bad-btn-text").innerText = data.badBtnText;
-  document.getElementById("bad-result").innerText = data.badResult;
   document.getElementById("good-title").innerText = data.goodTitle;
-  document.getElementById("good-desc").innerText = data.goodDesc;
-  document.getElementById("good-btn-text").innerText = data.goodBtnText;
-  document.getElementById("good-result").innerText = data.goodResult;
-  document.getElementById("info-title").innerText = data.infoTitle;
-  document.getElementById("info-desc").innerText = data.infoDesc;
-  document.getElementById("back-btn").innerText = data.backBtn;
+  document.getElementById("good-header").innerText = data.goodHeader;
+  document.getElementById("bad-title").innerText = data.badTitle;
+  document.getElementById("bad-header").innerText = data.badHeader;
+  document.getElementById("good-footer").innerText = data.goodFooter;
+  document.getElementById("bad-footer").innerText = data.badFooter;
+  document.getElementById("journey-title").innerText = data.journeyTitle;
+  document.getElementById("journey-desc").innerText = data.journeyDesc;
+  document.getElementById("point1-title").innerText = data.point1Title;
+  document.getElementById("point1-desc").innerText = data.point1Desc;
+  document.getElementById("point2-title").innerText = data.point2Title;
+  document.getElementById("point2-desc").innerText = data.point2Desc;
+  document.getElementById("point3-title").innerText = data.point3Title;
+  document.getElementById("point3-desc").innerText = data.point3Desc;
+
+  // تحديث النقاط القائمة
+  const updatePoints = (id, points) => {
+    const list = document.getElementById(id);
+    list.innerHTML = "";
+    points.forEach(p => {
+      const li = document.createElement("li");
+      li.innerText = p;
+      list.appendChild(li);
+    });
+  };
+  
+  updatePoints("good-points", data.goodPoints);
+  updatePoints("bad-points", data.badPoints);
 }
 
 // دالة التحويل مع إفكت الضبابية الاحترافي بالتزامن
@@ -188,9 +292,29 @@ function toggleLang() {
   }, 200);
 }
 
+// تشغيل محاكاة تدفق البيانات التفاعلية بشكل مستمر
+function simulateDataFlow() {
+  const nodes = document.querySelectorAll('.data-node');
+  let currentNode = 0;
+
+  function pulseNode() {
+    // تصفير الألوان السابقة
+    nodes.forEach(n => { n.style.borderColor = 'var(--cyan-neon)'; n.style.transform = 'scale(1)'; });
+    
+    // تفعيل النود الحالية بلون أخضر
+    nodes[currentNode].style.borderColor = 'var(--green-neon)';
+    nodes[currentNode].style.transform = 'scale(1.2)';
+    
+    currentNode = (currentNode + 1) % nodes.length;
+    setTimeout(pulseNode, 800);
+  }
+  pulseNode();
+}
+
 // تشغيل النظام وتحديد اللغة عند تحميل الصفحة
 window.onload = function() {
   applyLanguage(currentLang);
+  simulateDataFlow(); // تشغيل المحاكاة
 };
 </script>
 </body>
