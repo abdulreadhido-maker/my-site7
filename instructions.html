@@ -7,23 +7,53 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <style>
         :root {
-            --primary-gradient: linear-gradient(45deg, #ff00cc, #3333ff, #00ffff, #ff00cc);
-            --neon-glow: 0 0 10px #ff00cc, 0 0 20px #00ffff, 0 0 30px #3333ff;
+            /* الألوان النيونية الجديدة: أخضر وأزرق */
+            --primary-gradient: linear-gradient(45deg, #00ff88, #00ffff, #3333ff, #00ff88);
+            --neon-glow: 0 0 10px #00ff88, 0 0 20px #00ffff, 0 0 30px #3333ff;
+            
+            /* ألوان الخلفية والعناصر على درجات الرمادي والأسود */
             --bg-dark: #0a0a0c;
-            --card-bg: rgba(25, 25, 28, 0.6);
-            --border-color: rgba(255, 255, 255, 0.1);
+            --card-bg: rgba(25, 25, 28, 0.7); /* تغميق الخلفية قليلاً */
+            --border-color: rgba(255, 255, 255, 0.08); /* حواف أنعم */
             --white: #ffffff;
-            --text-main: #ffffff;
+            --text-main: #f8fafc; /* أبيض مائل للرمادي قليلاً */
             --secondary: #94a3b8;
+            
+            /* ألوان تمييز محددة */
             --cyan: #00ffff;
-            --pink: #ff00cc;
             --green: #00ff88;
+            --blue: #3333ff;
+
+            /* متغيرات للتحكم في تأثير الانتقال */
+            --blur-amount: 0px; 
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         html { scroll-behavior: smooth; }
-        body { background: var(--bg-dark); color: var(--text-main); min-height: 100vh; padding: 120px 8% 60px; position: relative; overflow-x: hidden; }
-        body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 50% 50%, rgba(255, 0, 204, 0.02), transparent 75%); z-index: -1; }
+        
+        body { 
+            background: var(--bg-dark); 
+            color: var(--text-main); 
+            min-height: 100vh; 
+            padding: 120px 8% 60px; 
+            position: relative; 
+            overflow-x: hidden;
+            /* إضافة تأثير الضبابية والانتقال للـ body */
+            filter: blur(var(--blur-amount));
+            transition: filter 0.4s ease, background 0.5s ease;
+        }
+
+        /* تأثير الخلفية المتوهج - تم تحديثه للألوان الجديدة */
+        body::before { 
+            content: ""; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: radial-gradient(circle at 50% 50%, rgba(0, 255, 255, 0.03), transparent 75%); 
+            z-index: -1; 
+        }
 
         /* تأثير ناعم لانتقال عناصر المحتوى بأكمله عند الترجمة */
         .page-fade-content {
@@ -38,28 +68,75 @@
 
         /* أزرار التحكم العلوية */
         .top-controls { position: fixed; top: 30px; left: 8%; right: 8%; display: flex; justify-content: space-between; z-index: 1000; pointer-events: none; }
-        .back-home, .lang-btn { padding: 12px 28px; background: var(--card-bg); border: 1px solid var(--border-color); color: #fff; text-decoration: none; border-radius: 30px; font-weight: 600; font-size: 14px; backdrop-filter: blur(10px); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 15px rgba(0,0,0,0.3); pointer-events: auto; cursor: pointer; display: flex; align-items: center; gap: 6px; }
-        .back-home:hover, .lang-btn:hover { border-color: var(--pink); box-shadow: 0 0 15px var(--pink); transform: translateY(-2px); }
+        
+        .back-home, .lang-btn { 
+            padding: 12px 28px; 
+            background: rgba(20, 20, 22, 0.8); /* خلفية داكنة أكثر */
+            border: 1px solid var(--border-color); 
+            color: #fff; 
+            text-decoration: none; 
+            border-radius: 30px; 
+            font-weight: 600; 
+            font-size: 14px; 
+            backdrop-filter: blur(10px); 
+            -webkit-backdrop-filter: blur(10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5); 
+            pointer-events: auto; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            gap: 6px; 
+        }
+        
+        /* تأثير الحوم المحدث للون الأزرق/الأخضر */
+        .back-home:hover, .lang-btn:hover { 
+            border-color: var(--cyan); 
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.5); 
+            transform: translateY(-2px); 
+        }
         
         /* تأثير الدوران على أيقونة الكرة الأرضية داخل الزر */
         .lang-btn span { display: inline-block; transition: transform 0.5s ease; }
         .lang-btn.clicked span { transform: rotate(360deg); }
 
         .header-area { text-align: center; margin-bottom: 60px; }
-        .header-area h1 { font-size: clamp(32px, 5vw, 46px); font-weight: 900; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-size: 300%; animation: gradientShift 5s infinite linear; }
+        .header-area h1 { 
+            font-size: clamp(32px, 5vw, 46px); 
+            font-weight: 900; 
+            background: var(--primary-gradient); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            background-size: 300%; 
+            animation: gradientShift 5s infinite linear; 
+        }
         .header-area p { color: var(--secondary); font-size: 17px; margin-top: 15px; max-width: 700px; margin-left: auto; margin-right: auto; line-height: 1.6; }
 
         .quick-nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-bottom: 60px; }
         .quick-nav a { padding: 12px 24px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); color: var(--secondary); text-decoration: none; border-radius: 30px; font-size: 14px; font-weight: 600; transition: all 0.3s ease; }
+        
+        /* حوم القائمة السريعة للون الأزرق */
         .quick-nav a:hover { color: #fff; border-color: var(--cyan); box-shadow: 0 0 15px rgba(0,255,255,0.3); transform: translateY(-2px); }
 
-        .guide-section { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 24px; padding: 40px; margin-bottom: 50px; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); transition: opacity 0.6s ease, transform 0.6s ease; scroll-margin-top: 100px; }
+        .guide-section { 
+            background: var(--card-bg); 
+            border: 1px solid var(--border-color); 
+            border-radius: 24px; 
+            padding: 40px; 
+            margin-bottom: 50px; 
+            backdrop-filter: blur(12px); 
+            -webkit-backdrop-filter: blur(12px); 
+            transition: opacity 0.6s ease, transform 0.6s ease; 
+            scroll-margin-top: 100px; 
+        }
         .section-title { font-size: 26px; font-weight: 800; color: #fff; margin-bottom: 25px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 15px; }
         .section-title span { background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
         .steps-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
         .step-item { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 25px; border-radius: 16px; position: relative; transition: 0.3s; }
-        .step-item:hover { transform: translateY(-4px); background: rgba(255,255,255,0.04); border-color: rgba(0,255,255,0.2); }
+        
+        /* حوم العناصر للون الأزرق النيوني */
+        .step-item:hover { transform: translateY(-4px); background: rgba(255,255,255,0.04); border-color: rgba(0,255,255,0.3); }
         
         /* ضبط موقع الأرقام التلقائي بناءً على اتجاه اللغة */
         html[dir="rtl"] .step-num { left: 20px; }
@@ -72,11 +149,13 @@
         .tools-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; margin-top: 30px; }
         .tool-link { text-decoration: none; color: inherit; }
         .tool-card { background: rgba(10, 10, 12, 0.5); border: 1px solid var(--border-color); padding: 30px; border-radius: 16px; text-align: center; transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1); }
+        
+        /* حوم بطاقة الأدوات مع توهج أزرق/أخضر */
         .tool-card:hover { transform: translateY(-8px); border-color: var(--cyan); box-shadow: var(--neon-glow); }
         .tool-icon { font-size: 40px; margin-bottom: 15px; }
         .tool-card h4 { font-size: 19px; color: #fff; margin-bottom: 8px; }
         .tool-card p { font-size: 13px; color: var(--secondary); }
-        .tool-btn { display: inline-block; margin-top: 20px; padding: 8px 20px; background: var(--primary-gradient); border-radius: 30px; color: #fff; font-size: 13px; font-weight: bold; }
+        .tool-btn { display: inline-block; margin-top: 20px; padding: 8px 20px; background: var(--primary-gradient); border-radius: 30px; color: #fff; font-size: 13px; font-weight: bold; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
 
         .checker-box { background: rgba(10, 10, 12, 0.4); border: 1px dashed rgba(0, 255, 255, 0.2); border-radius: 16px; padding: 25px; margin-top: 20px; }
         .checker-option { display: flex; align-items: center; gap: 12px; margin-bottom: 15px; cursor: pointer; font-size: 15px; color: var(--secondary); transition: 0.2s; }
@@ -85,13 +164,13 @@
         .checker-result { margin-top: 25px; padding: 20px; border-radius: 12px; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); text-align: center; display: none; }
         .checker-score { font-size: 24px; font-weight: 800; color: var(--green); margin-bottom: 5px; }
 
-        /* تغيير اتجاه الحواف الملونة بناء على اتجاه اللغة */
-        html[dir="rtl"] .border-lang-1 { border-right: 3px solid var(--pink); border-left: none; }
+        /* تغيير اتجاه الحواف الملونة بناء على اتجاه اللغة - تم تحديث الألوان */
+        html[dir="rtl"] .border-lang-1 { border-right: 3px solid var(--green); border-left: none; }
         html[dir="rtl"] .border-lang-2 { border-right: 3px solid var(--cyan); border-left: none; }
-        html[dir="rtl"] .border-lang-3 { border-right: 3px solid var(--green); border-left: none; }
-        html[dir="ltr"] .border-lang-1 { border-left: 3px solid var(--pink); border-right: none; }
+        html[dir="rtl"] .border-lang-3 { border-right: 3px solid var(--blue); border-left: none; }
+        html[dir="ltr"] .border-lang-1 { border-left: 3px solid var(--green); border-right: none; }
         html[dir="ltr"] .border-lang-2 { border-left: 3px solid var(--cyan); border-right: none; }
-        html[dir="ltr"] .border-lang-3 { border-left: 3px solid var(--green); border-right: none; }
+        html[dir="ltr"] .border-lang-3 { border-left: 3px solid var(--blue); border-right: none; }
 
         @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
@@ -129,17 +208,17 @@
     <div id="what-must" class="guide-section">
         <div class="section-title"><span data-en="📋 What should you do before starting your project?" data-ar="📋 ماذا يجب عليك فعله قبل بدء مشروعك؟">📋 ماذا يجب عليك فعله قبل بدء مشروعك؟</span></div>
         <div class="steps-list">
-            <div class="step-item">
+            <div class="step-item border-lang-1">
                 <div class="step-num">01</div>
                 <h4 data-en="Define Strategic Goals" data-ar="تحديد الأهداف الاستراتيجية">تحديد الأهداف الاستراتيجية</h4>
                 <p data-en="You must know the purpose of the system; is it to gather leads, sell digital products, or manage complex internal operations?" data-ar="يجب معرفة الغرض من النظام؛ هل هو لجمع العملاء المتوقعين، بيع منتجات رقمية، أم لإدارة عمليات داخلية معقدة؟">يجب معرفة الغرض من النظام؛ هل هو لجمع العملاء المتوقعين، بيع منتجات رقمية، أم لإدارة عمليات داخلية معقدة؟</p>
             </div>
-            <div class="step-item">
+            <div class="step-item border-lang-2">
                 <div class="step-num">02</div>
                 <h4 data-en="Prepare Content & Identity" data-ar="تحضير المحتوى والهوية">تحضير المحتوى والهوية</h4>
                 <p data-en="Prepare the website basic texts, logo, preferred colors, and product images to ensure acceleration of the software execution process." data-ar="تجهيز النصوص الأساسية للموقع، الشعار (Logo)، الألوان المفضلة، وصور المنتجات لضمان تسريع وثيرة التنفيذ البرمجي.">تجهيز النصوص الأساسية للموقع، الشعار (Logo)، الألوان المفضلة، وصور المنتجات لضمان تسريع وثيرة التنفيذ البرمجي.</p>
             </div>
-            <div class="step-item">
+            <div class="step-item border-lang-3">
                 <div class="step-num">03</div>
                 <h4 data-en="Understand Target Audience" data-ar="فهم فئة المستخدمين">فهم فئة المستخدمين</h4>
                 <p data-en="Study your visitors' behavior and know their most used devices to adapt the user interface based on their real needs." data-ar="دراسة سلوك زوار موقعك ومعرفة الأجهزة الأكثر استخداماً لديهم لتكييف واجهة المستخدم بناءً على رغباتهم الحقيقية.">دراسة سلوك زوار موقعك ومعرفة الأجهزة الأكثر استخداماً لديهم لتكييف واجهة المستخدم بناءً على رغباتهم الحقيقية.</p>
@@ -154,7 +233,7 @@
         <div class="checker-box">
             <label class="checker-option">
                 <input type="checkbox" class="check-item" value="25" onchange="runCheckReady()">
-                <span data-en="I have a clear, written idea with precisely defined goals." data-ar="لدي فكرة واضحة ومكتبوبة ومحددة الأهداف بدقة.">لدي فكرة واضحة ومكتوبة ومحددة الأهداف بدقة.</span>
+                <span data-en="I have a clear, written idea with precisely defined goals." data-ar="لدي فكرة واضحة ومكتوبة ومحددة الأهداف بدقة.">لدي فكرة واضحة ومكتوبة ومحددة الأهداف بدقة.</span>
             </label>
             <label class="checker-option">
                 <input type="checkbox" class="check-item" value="25" onchange="runCheckReady()">
@@ -203,11 +282,11 @@
             التخطيط السلكي هو الهيكل العظمي الأسود والأبيض لمشروعك قبل إضافة الألوان. يساعدنا التخطيط في وضع كل زر، نموذج، وصورة في مكانها الصحيح استناداً إلى سيكولوجية الزائر، مما يرفع من معدل التحويل والمبيعات بشكل هائل.
         </p>
         <div class="steps-list">
-            <div class="step-item">
+            <div class="step-item border-lang-2">
                 <h4 data-en="Visual Element Arrangement" data-ar="ترتيب العناصر بصرياً">ترتيب العناصر بصرياً</h4>
                 <p data-en="Placing the most important elements (such as Call to Action buttons) at the top of the page to ensure they are seen directly without long scrolling." data-ar="وضع العناصر الأهم (مثل زر اتخاذ القرار) في أعلى الصفحة لضمان رؤيتها مباشرة دون الحاجة للتمرير الطويل.">وضع العناصر الأهم (مثل زر اتخاذ القرار) في أعلى الصفحة لضمان رؤيتها مباشرة دون الحاجة للتمرير الطويل.</p>
             </div>
-            <div class="step-item">
+            <div class="step-item border-lang-1">
                 <h4 data-en="Cloud Databases" data-ar="قواعد البيانات السحابية">قواعد البيانات السحابية</h4>
                 <p data-en="Planning relational tables, separating sensitive user data, and encrypting it to prevent any future leaks." data-ar="تخطيط الجداول العلائقية وفصل بيانات المستخدمين الحساسة وتشفيرها لمنع أي تسريبات مستقبلية.">تخطيط الجداول العلائقية وفصل بيانات المستخدمين الحساسة وتشفيرها لمنع أي تسريبات مستقبلية.</p>
             </div>
@@ -217,15 +296,15 @@
     <div id="support-sec" class="guide-section">
         <div class="section-title"><span data-en="🛡️ Comprehensive Support & Maintenance System" data-ar="🛡️ نظام المساعدات والصيانة الشاملة">🛡️ نظام المساعدات والصيانة الشاملة</span></div>
         <div class="steps-list">
-            <div class="step-item">
+            <div class="step-item border-lang-3">
                 <h4 data-en="Continuous Monitoring (24/7)" data-ar="المراقبة المستمرة (24/7)">المراقبة المستمرة (24/7)</h4>
                 <p data-en="A smart system monitors the server and sends automatic alerts in case of any abnormal traffic pressure to resolve the issue immediately." data-ar="نظام ذكي يقوم بمراقبة السيرفر وإرسال تنبيهات تلقائية في حال حدوث أي ضغط غير طبيعي لحل المشكلة فوراً.">نظام ذكي يقوم بمراقبة السيرفر وإرسال تنبيهات تلقائية في حال حدوث أي ضغط غير طبيعي لحل المشكلة فوراً.</p>
             </div>
-            <div class="step-item">
+            <div class="step-item border-lang-2">
                 <h4 data-en="Automatic Backup" data-ar="النسخ الاحتياطي التلقائي">النسخ الاحتياطي التلقائي</h4>
                 <p data-en="Periodic backups (daily & weekly) are taken of your project files and databases and stored on completely separate servers." data-ar="يتم أخذ نسخ احتياطية دورية (يومية وأسبوعية) من ملفات مشروعك وقواعد البيانات وتخزينها في سيرفرات منفصلة تماماً.">يتم أخذ نسخ احتياطية دورية (يومية وأسبوعية) من ملفات مشروعك وقواعد البيانات وتخزينها في سيرفرات منفصلة تماماً.</p>
             </div>
-            <div class="step-item">
+            <div class="step-item border-lang-1">
                 <h4 data-en="Periodic Software Updates" data-ar="التحديثات البرمجية الدورية">التحديثات البرمجية الدورية</h4>
                 <p data-en="Updating software libraries and patching globally discovered vulnerabilities to ensure your site stands firm against DDoS attacks." data-ar="تحديث المكتبات البرمجية وسد الثغرات المكتشفة عالمياً لضمان صمود موقعك أمام هجمات الحرمان من الخدمة (DDoS).">تحديث المكتبات البرمجية وسد الثغرات المكتشفة عالمياً لضمان صمود موقعك أمام هجمات الحرمان من الخدمة (DDoS).</p>
             </div>
@@ -265,6 +344,7 @@
 </div>
 
 <script>
+    // تم تحديث الألوان في رسائل الجافا سكريبت لتناسب الثيم الجديد
     const messages = {
         ar: {
             step1: "فكرتك في البداية تماماً! ننصحك بقراءة قسم (ماذا يجب عليك فعله) بالكامل لترتيب الهيكل الأساسي.",
@@ -297,16 +377,16 @@
         if(score === 0) {
             resultBox.style.display = "none";
         } else if(score <= 25) {
-            scoreTxt.style.color = "#ff00cc";
+            scoreTxt.style.color = "var(--secondary)"; // رمادي للبداية
             statusTxt.innerText = messages[currentLang].step1;
         } else if(score <= 50) {
-            scoreTxt.style.color = "#3333ff";
+            scoreTxt.style.color = "var(--blue)"; // أزرق نيون
             statusTxt.innerText = messages[currentLang].step2;
         } else if(score <= 75) {
-            scoreTxt.style.color = "#00ffff";
+            scoreTxt.style.color = "var(--cyan)"; // سيان نيون
             statusTxt.innerText = messages[currentLang].step3;
         } else {
-            scoreTxt.style.color = "#00ff88";
+            scoreTxt.style.color = "var(--green)"; // أخضر نيون للجاهزية التامة
             statusTxt.innerText = messages[currentLang].step4;
         }
     }
@@ -322,7 +402,8 @@
         langBtn.classList.add('clicked');
         setTimeout(() => langBtn.classList.remove('clicked'), 500);
 
-        // 2. تشغيل تأثير الإخفاء التدريجي للمحتوى
+        // 2. تطبيق الضبابية على الخلفية وتفعيل تأثير الاختفاء للمحتوى
+        document.body.style.setProperty('--blur-amount', '10px');
         mainContent.classList.add('is-translating');
 
         // 3. تغيير البيانات والاتجاه بعد اختفاء النص (لحماية العين من القفزات البصرية)
@@ -339,10 +420,14 @@
                 translatePage('ar');
             }
             
+            // إعادة حساب الجاهزية باللغة الجديدة
             runCheckReady();
 
-            // 4. إعادة إظهار المحتوى بالشكل الجديد والاتجاه الجديد
+            // 4. إعادة إظهار المحتوى بالشكل الجديد والاتجاه الجديد وإزالة الضبابية
             mainContent.classList.remove('is-translating');
+            setTimeout(() => {
+                document.body.style.setProperty('--blur-amount', '0px');
+            }, 100);
         }, 250); 
     }
 
@@ -352,6 +437,7 @@
         });
     }
 
+    // تأثير الظهور التدريجي للأقسام عند التمرير
     const sections = document.querySelectorAll('.guide-section');
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
